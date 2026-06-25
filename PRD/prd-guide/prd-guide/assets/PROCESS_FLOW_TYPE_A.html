@@ -1,0 +1,817 @@
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f7f6f3; --surface: #ffffff;
+    --border: #e4e2db; --border-strong: #ccc9bf;
+    --text: #1a1916; --text-2: #5c5a54; --text-3: #9c9a92;
+    --pm: #3B6D11;     --pm-bg: #EAF3DE;
+    --design: #185FA5; --design-bg: #E6F1FB;
+    --fe: #0F6E56;     --fe-bg: #E1F5EE;
+    --be: #5c5a54;     --be-bg: #f1efe8;
+    --qa: #993C1D;     --qa-bg: #FAECE7;
+    --ai: #534AB7;     --ai-bg: #EEEDFE;
+    --policy: #854F0B; --policy-bg: #FAEEDA;
+    --phase1: #3B6D11; --phase2: #185FA5;
+    --phase3: #534AB7; --phase4: #993C1D;
+  }
+  body, .prd-wrap {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--text); padding: 24px 20px 60px;
+  }
+
+  /* 헤더 */
+  .doc-header { margin-bottom: 28px; }
+  .doc-header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .doc-header p { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .doc-header .meta { display: flex; gap: 16px; margin-top: 12px; font-size: 11px; color: var(--text-3); font-family: monospace; }
+
+  /* 문서 구조 맵 */
+  .doc-map { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin-bottom: 28px; }
+  .doc-map-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-3); margin-bottom: 12px; }
+  .doc-map-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .doc-map-col-title { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .doc-map-row { display: flex; gap: 6px; align-items: center; margin-bottom: 5px; }
+  .doc-map-indent { font-size: 11px; color: var(--text-3); }
+  .doc-chip { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 6px; border: 1px solid; white-space: nowrap; }
+  .chip-top    { color: var(--phase1); border-color: var(--phase1); background: var(--pm-bg); }
+  .chip-us     { color: var(--phase2); border-color: var(--phase2); background: var(--design-bg); }
+  .chip-policy { color: var(--policy); border-color: var(--policy); background: var(--policy-bg); }
+  .chip-screen { color: var(--phase3); border-color: var(--phase3); background: var(--ai-bg); }
+  .chip-tech   { color: var(--be);     border-color: var(--border);  background: var(--be-bg); }
+  .doc-map-sep { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-3); line-height: 1.6; }
+
+  /* 하이브리드 안내 */
+  .hybrid-note {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--phase3); border-radius: 0 10px 10px 0;
+    padding: 12px 16px; margin-bottom: 28px; font-size: 12px; color: var(--text-2); line-height: 1.8;
+  }
+  .hybrid-note strong { color: var(--text); font-weight: 600; }
+  .hybrid-note .point { display: flex; gap: 8px; margin-top: 5px; }
+  .hybrid-note .point-num { font-family: monospace; font-size: 10px; color: var(--phase3); font-weight: 600; flex-shrink: 0; padding-top: 2px; }
+
+  /* Phase */
+  .phase { display: flex; gap: 0; }
+  .phase-rail { width: 150px; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; padding-right: 18px; padding-top: 14px; }
+  .phase-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 9px; border-radius: 100px; border: 1px solid; white-space: nowrap; margin-bottom: 4px; }
+  .phase-name { font-size: 12px; font-weight: 600; text-align: right; line-height: 1.4; }
+  .phase-1 .phase-tag  { color: var(--phase1); border-color: var(--phase1); background: var(--pm-bg); }
+  .phase-1 .phase-name { color: var(--phase1); }
+  .phase-2 .phase-tag  { color: var(--phase2); border-color: var(--phase2); background: var(--design-bg); }
+  .phase-2 .phase-name { color: var(--phase2); }
+  .phase-3 .phase-tag  { color: var(--phase3); border-color: var(--phase3); background: var(--ai-bg); }
+  .phase-3 .phase-name { color: var(--phase3); }
+  .phase-4 .phase-tag  { color: var(--phase4); border-color: var(--phase4); background: var(--qa-bg); }
+  .phase-4 .phase-name { color: var(--phase4); }
+  .phase-5 .phase-tag  { color: #0F6E56; border-color: #0F6E56; background: #E1F5EE; }
+  .phase-5 .phase-name { color: #0F6E56; }
+
+  .phase-body { flex: 1; border-left: 1.5px solid var(--border); padding-left: 22px; padding-bottom: 32px; }
+  .phase:last-child .phase-body { border-left-color: transparent; }
+  .phase-body::before { content: ''; display: block; width: 10px; height: 10px; border-radius: 50%; margin-left: -27px; margin-top: 18px; margin-bottom: -4px; float: left; }
+  .phase-1 .phase-body::before { background: var(--phase1); }
+  .phase-2 .phase-body::before { background: var(--phase2); }
+  .phase-3 .phase-body::before { background: var(--phase3); }
+  .phase-4 .phase-body::before { background: var(--phase4); }
+  .phase-5 .phase-body::before { background: #0F6E56; }
+  .step.after-step { border-color: #0F6E56; background: #f0faf6; position: relative; }
+  .step.after-step::after { content: '배포 후 확인'; position: absolute; top: -1px; right: 8px; font-size: 9px; font-weight: 600; color: #0F6E56; background: #E1F5EE; padding: 1px 6px; border-radius: 0 0 6px 6px; }
+  .badge-after { color: #0F6E56; background: #E1F5EE; }
+
+  .phase-title { font-size: 14px; font-weight: 600; color: var(--text); padding-top: 12px; margin-bottom: 3px; clear: both; }
+  .phase-subtitle { font-size: 11px; color: var(--text-3); margin-bottom: 14px; font-family: monospace; }
+
+  .sub-section { margin-bottom: 8px; }
+  .sub-section-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-3); margin-bottom: 7px; border-left: 2px solid var(--border-strong); padding-left: 7px; }
+
+  /* 병행 구간 */
+  .parallel-wrap { border: 1px dashed var(--border-strong); border-radius: 10px; padding: 18px 10px 10px; margin-bottom: 8px; position: relative; }
+  .parallel-label { position: absolute; top: -9px; left: 10px; font-size: 10px; font-weight: 600; color: var(--policy); background: var(--surface); padding: 0 5px; border: 1px solid var(--policy-bg); border-radius: 4px; }
+  .parallel-cols { display: flex; gap: 8px; align-items: stretch; }
+  .parallel-col { flex: 1; }
+  .parallel-col-label { font-size: 10px; font-weight: 600; color: var(--text-3); margin-bottom: 5px; text-align: center; }
+  .parallel-divider { width: 1px; background: var(--border); flex-shrink: 0; align-self: stretch; }
+  .parallel-note { font-size: 11px; color: var(--policy); margin-top: 8px; padding: 5px 8px; background: var(--policy-bg); border-radius: 5px; }
+
+  /* Step */
+  .step-row { display: flex; flex-direction: column; gap: 7px; margin-bottom: 7px; }
+  .step-group { display: flex; gap: 7px; align-items: stretch; }
+  .step { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; }
+  .step.ai-step { border-color: var(--ai); background: #faf9ff; }
+  .step.key { border-color: var(--phase3); background: #faf9ff; position: relative; }
+  .step.key::after { content: '핵심'; position: absolute; top: -1px; right: 8px; font-size: 9px; font-weight: 600; color: var(--ai); background: var(--ai-bg); padding: 1px 6px; border-radius: 0 0 6px 6px; }
+  .step.policy-step { border-color: var(--policy); background: #fffaf5; }
+
+  .step-num { font-family: monospace; font-size: 10px; color: var(--text-3); margin-bottom: 4px; }
+  .step-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; line-height: 1.4; }
+  .step-desc { font-size: 12px; color: var(--text-2); line-height: 1.6; margin-bottom: 7px; }
+  .step-note { font-size: 11px; color: var(--ai); line-height: 1.5; margin-bottom: 7px; padding: 5px 8px; background: var(--ai-bg); border-radius: 5px; }
+  .step-note.policy-note { color: var(--policy); background: var(--policy-bg); }
+  .step-output { font-size: 11px; color: var(--text-3); margin-bottom: 7px; }
+  .step-output::before { content: '→ '; font-family: monospace; }
+  .badges { display: flex; flex-wrap: wrap; gap: 4px; }
+  .badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 100px; border: 1px solid transparent; }
+  .badge-pm     { color: var(--pm);     background: var(--pm-bg); }
+  .badge-design { color: var(--design); background: var(--design-bg); }
+  .badge-fe     { color: var(--fe);     background: var(--fe-bg); }
+  .badge-be     { color: var(--be);     background: var(--be-bg); border-color: var(--border); }
+  .badge-qa     { color: var(--qa);     background: var(--qa-bg); }
+  .badge-ai     { color: var(--ai);     background: var(--ai-bg); }
+  .badge-claude-design { color: #ffffff; background: var(--ai); }
+  .badge-policy { color: var(--policy); background: var(--policy-bg); }
+
+  /* AI 자동화 상세 토글 */
+  .ai-detail { margin-top: 8px; }
+  .ai-toggle-btn {
+    width: 100%; background: var(--ai-bg); border: 1px solid var(--ai);
+    border-radius: 7px; padding: 6px 10px; cursor: pointer;
+    font-size: 11px; font-weight: 600; color: var(--ai);
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .ai-toggle-btn:hover { background: #e8e6fc; }
+  .ai-toggle-btn .chevron { font-size: 10px; transition: transform 0.2s; }
+  .ai-toggle-btn.open .chevron { transform: rotate(180deg); }
+  .ai-detail-body {
+    display: none; margin-top: 6px; padding: 12px 14px;
+    background: var(--surface); border: 1px solid var(--ai);
+    border-radius: 7px; font-size: 12px; color: var(--text-2); line-height: 1.7;
+  }
+  .ai-detail-body.open { display: block; }
+  .ai-detail-section { margin-bottom: 10px; }
+  .ai-detail-section:last-child { margin-bottom: 0; }
+  .ai-detail-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); margin-bottom: 5px; }
+  .ai-detail-body pre {
+    background: #f1f0fa; border: 1px solid #d4d1f5; border-radius: 6px;
+    padding: 10px 12px; font-size: 11px; line-height: 1.7; color: var(--text);
+    white-space: pre-wrap; word-break: break-word; font-family: monospace;
+    margin-top: 4px;
+  }
+  .ai-detail-tip { padding: 6px 10px; background: var(--pm-bg); border-radius: 5px; font-size: 11px; color: var(--pm); margin-top: 5px; }
+
+  /* 화살표 */
+  .step-arrow { display: flex; align-items: center; gap: 7px; padding: 4px 0; margin-left: 2px; }
+  .step-arrow .arrow-label { font-size: 11px; color: var(--text-3); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+
+  /* 루프 노트 */
+  .loop-note { margin-top: 8px; padding: 9px 13px; background: var(--bg); border: 1px dashed var(--border-strong); border-radius: 8px; font-size: 12px; color: var(--text-2); line-height: 1.6; display: flex; gap: 7px; }
+  .loop-icon { font-family: monospace; color: var(--text-3); flex-shrink: 0; }
+
+  /* 백로그 바 */
+  .backlog-bar { display: flex; align-items: center; gap: 7px; padding: 7px 11px; background: var(--ai-bg); border: 1px solid var(--ai); border-radius: 7px; margin-bottom: 7px; font-size: 11px; color: var(--ai); font-weight: 500; }
+  .backlog-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ai); flex-shrink: 0; }
+
+  .fill-row { display: flex; gap: 5px; align-items: center; margin: 5px 0 9px; font-size: 11px; color: var(--text-3); flex-wrap: wrap; }
+  .fill-chip { padding: 2px 7px; border-radius: 100px; font-size: 10px; font-weight: 500; }
+  .fill-done  { background: var(--pm-bg); color: var(--pm); }
+  .fill-now   { background: var(--design-bg); color: var(--design); border: 1px solid var(--design); }
+  .fill-later { background: var(--be-bg); color: var(--be); border: 1px solid var(--border); }
+
+  .inner-divider { margin: 14px 0; border: none; border-top: 1px dashed var(--border); }
+
+  /* legend */
+  .legend { margin-top: 20px; padding: 12px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .legend-label { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-right: 5px; }
+  .legend-sep { width: 1px; height: 14px; background: var(--border); margin: 0 5px; }
+  .legend-note { font-size: 11px; color: var(--text-3); font-family: monospace; }
+</style>
+
+<div class="prd-wrap">
+
+<div class="doc-header">
+  <h1>PRD 업무 프로세스 — 신규 서비스/기능 구축형 과제</h1>
+  <p>유저스토리를 먼저 도출하고, 정책서는 병행으로 작성합니다.<br>JIRA 백로그는 기획 초반에 선등록하고 상세 내용을 각 Phase에서 점진적으로 채워갑니다.</p>
+  <div class="meta">
+    <span>SFN Product</span><span>|</span><span>플랫폼팀</span><span>|</span><span>v3.0</span>
+  </div>
+</div>
+
+<!-- 문서 구조 맵 -->
+<div class="doc-map">
+  <div class="doc-map-title">Confluence 문서 구조</div>
+  <div class="doc-map-grid">
+    <div>
+      <div class="doc-map-col-title">소규모 · OP — 통합</div>
+      <div class="doc-map-row"><div class="doc-chip chip-top">📄 [상태] PJ/OP 최상위 문서</div></div>
+      <div class="doc-map-row" style="margin-left:16px"><span class="doc-map-indent">├─</span><div class="doc-chip chip-us" style="margin-left:4px">01. 정책 및 유저스토리</div></div>
+      <div class="doc-map-row" style="margin-left:16px"><span class="doc-map-indent">├─</span><div class="doc-chip chip-screen" style="margin-left:4px">02. Screen — {지면명}</div></div>
+      <div class="doc-map-row" style="margin-left:16px"><span class="doc-map-indent">└─</span><div class="doc-chip chip-tech" style="margin-left:4px">03. TechSpec</div></div>
+    </div>
+    <div>
+      <div class="doc-map-col-title">중대규모 · PJ — 분리</div>
+      <div class="doc-map-row"><div class="doc-chip chip-top">📄 [상태] PJ/OP 최상위 문서</div></div>
+      <div class="doc-map-row" style="margin-left:16px"><span class="doc-map-indent">├─</span><div class="doc-chip chip-us" style="margin-left:4px">01-1. 유저스토리</div></div>
+      <div class="doc-map-row" style="margin-left:16px"><span class="doc-map-indent">├─</span><div class="doc-chip chip-policy" style="margin-left:4px">01-2. 정책</div></div>
+      <div class="doc-map-row" style="margin-left:16px"><span class="doc-map-indent">├─</span><div class="doc-chip chip-screen" style="margin-left:4px">02. Screen — {지면명}</div></div>
+      <div class="doc-map-row" style="margin-left:16px"><span class="doc-map-indent">└─</span><div class="doc-chip chip-tech" style="margin-left:4px">03. TechSpec</div></div>
+    </div>
+  </div>
+  <div class="doc-map-sep">분리 기준: 유저스토리 6개 이상 · 정책 복잡도 높음 · 법무 검토 필요 · 관련 시스템 3개 이상</div>
+</div>
+
+<!-- 하이브리드 안내 -->
+<div class="hybrid-note">
+  <strong>핵심 원칙 4가지</strong>
+  <div class="point"><span class="point-num">01</span><span><strong>과제의 배경과 문제 정의가 시작이다</strong>. 왜 이 과제를 하는가(Why)와 무엇이 문제인가(What)를 먼저 명확히 해야 한다. 해결 방법(How)은 그 다음이다.</span></div>
+  <div class="point"><span class="point-num">02</span><span><strong>유저스토리 먼저, 정책서 병행</strong> — 사용자 관점을 먼저 정의해야 규칙의 방향이 잡힌다. 정책 확정 시 AC(Then 조건) 즉시 업데이트.</span></div>
+  <div class="point"><span class="point-num">03</span><span><strong>JIRA 백로그 선등록</strong> — 유저스토리 도출 직후 껍데기 Story 등록. 화면·TC·Sub-task는 각 Phase에서 채운다.</span></div>
+  <div class="point"><span class="point-num">04</span><span><strong>전체 범위·일정은 상위기획에서 확정</strong> — 폭포수 특성 유지. Story 단위 우선순위 조정은 언제든 가능.</span></div>
+</div>
+
+<!-- Phase 1 -->
+<div class="phase phase-1">
+  <div class="phase-rail">
+    <span class="phase-tag">Phase 1</span>
+    <span class="phase-name">상위기획</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-title">과제 정의 · 유저스토리 도출 · 정책서 병행</div>
+    <div class="phase-subtitle">산출물: 최상위 문서 · 유저스토리 · 정책서 · JIRA 백로그(초안) · TC 초안</div>
+
+    <div class="sub-section">
+      <div class="sub-section-label">과제 정의</div>
+      <div class="step-row"><div class="step-group">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-name">최상위 문서 작성</div>
+          <div class="step-desc">PJ/OP 제목 · 배경(Why) · OKR · 범위(포함/제외/고도화) · 배포 ETA · 과제 참여자</div>
+          <div class="step-output">Confluence 최상위 페이지</div>
+          <div class="badges"><span class="badge badge-pm">PM</span></div>
+          <div class="ai-detail">
+            <button class="ai-toggle-btn" onclick="toggleAI(this)">
+              <span>✦ AI 활용 — 배경·OKR 초안 생성</span><span class="chevron">▾</span>
+            </button>
+            <div class="ai-detail-body">
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">활용 시점</div>
+                <div>배경(Why) 문단과 OKR 초안을 작성할 때 사용. PM이 방향만 잡아주면 AI가 구조화해줌.</div>
+              </div>
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">프롬프트</div>
+                <pre>다음 정보를 바탕으로 PRD 최상위 문서의 배경과 OKR을 작성해줘.
+
+서비스명: {서비스명}
+과제 배경: {현황 및 문제점을 자유롭게 서술}
+이번에 하려는 것: {하려는 것}
+기대 효과: {기대 효과}
+
+출력 형식:
+- 배경(Why): 현황 → 문제/기회 → 필요성 순서로 3~4문장
+- Objective: 1~2문장
+- KR 목록: 측정 가능한 형태로 2~3개 (수치 미확정은 [TBD] 표기)</pre>
+              </div>
+              <div class="ai-detail-tip">✅ 작성 후 PM이 반드시 검토·수정. AI 초안을 그대로 쓰지 않는다.</div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-section-label">유저스토리 & 정책서 — 병행 작성</div>
+      <div class="parallel-wrap">
+        <span class="parallel-label">병행 작성 구간</span>
+        <div class="parallel-cols">
+          <div class="parallel-col">
+            <div class="parallel-col-label">먼저 시작</div>
+            <div class="step key">
+              <div class="step-num">02</div>
+              <div class="step-name">유저스토리 도출</div>
+              <div class="step-desc">As a / I want to / So that · AC 초안(Given/When/Then) · Open Items 식별</div>
+              <div class="step-note">사용자 관점 먼저 정의. 정책 확정 후 AC 보완.</div>
+              <div class="step-output">유저스토리 문서</div>
+              <div class="badges"><span class="badge badge-pm">PM</span></div>
+              <div class="ai-detail">
+                <button class="ai-toggle-btn" onclick="toggleAI(this)">
+                  <span>✦ AI 활용 — US·AC 도출 보조</span><span class="chevron">▾</span>
+                </button>
+                <div class="ai-detail-body">
+                  <div class="ai-detail-section">
+                    <div class="ai-detail-label">활용 시점</div>
+                    <div>과제 배경과 범위를 인풋으로 주면 AI가 유저스토리 목록과 AC 초안을 도출해줌.</div>
+                  </div>
+                  <div class="ai-detail-section">
+                    <div class="ai-detail-label">프롬프트</div>
+                    <pre>다음 과제 정보를 바탕으로 유저스토리와 인수 조건을 작성해줘.
+
+[최상위 문서 내용 붙여넣기]
+
+규칙:
+- 형식: As a [역할], I want to [행동], So that [가치]
+- 각 US에 인수 조건(AC) 3개 이상 작성
+- AC 형식: Given / When / Then
+- 정책 미확정 항목은 Then에 [TBD] 표기 후 Open Items에 별도 기재
+- 역할은 실제 사용자 유형으로 (예: 비로그인 사장님, BO 운영자)</pre>
+                  </div>
+                  <div class="ai-detail-tip">✅ AI 도출 후 PM이 누락된 역할·시나리오 추가 검토 필수.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="parallel-divider"></div>
+          <div class="parallel-col">
+            <div class="parallel-col-label">병행 작성</div>
+            <div class="step policy-step">
+              <div class="step-num">03</div>
+              <div class="step-name">정책서 작성</div>
+              <div class="step-desc">핵심 용어 · 비즈니스 규칙 · 중복/어뷰징 처리 · 예외 사례 · 비기능 요구사항</div>
+              <div class="step-note policy-note">유저스토리 기반으로 규칙 도출. 확정 시 AC Then 즉시 반영.</div>
+              <div class="step-output">정책서 문서</div>
+              <div class="badges"><span class="badge badge-pm">PM</span><span class="badge badge-policy">정책 확인</span></div>
+              <div class="ai-detail">
+                <button class="ai-toggle-btn" onclick="toggleAI(this)">
+                  <span>✦ AI 활용 — 예외 케이스·비기능 제안</span><span class="chevron">▾</span>
+                </button>
+                <div class="ai-detail-body">
+                  <div class="ai-detail-section">
+                    <div class="ai-detail-label">활용 시점</div>
+                    <div>PM이 주요 규칙을 작성한 뒤, AI에게 누락된 예외 케이스와 비기능 요구사항을 제안받는 용도.</div>
+                  </div>
+                  <div class="ai-detail-section">
+                    <div class="ai-detail-label">프롬프트</div>
+                    <pre>다음 정책서 초안을 검토하고 아래 항목을 제안해줘.
+
+[정책서 초안 붙여넣기]
+
+요청 항목:
+1. 누락된 예외 사례 (엣지 케이스)
+2. 어뷰징 방지를 위해 추가할 규칙
+3. 비기능 요구사항 (응답시간, 동시처리, 오류처리)
+4. Open Items로 등록해야 할 미확정 항목
+
+각 항목은 관련 유저스토리(US 번호)와 연결해서 제안해줘.</pre>
+                  </div>
+                  <div class="ai-detail-tip">✅ 제안 항목은 PM·정책 담당자가 검토 후 채택 여부 결정.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="parallel-note">↻ 루프 — 정책 규칙 확정 시 유저스토리 AC(Then 조건) 즉시 업데이트. Open Items 확정 순서에 따라 반복.</div>
+      </div>
+    </div>
+
+    <div class="step-arrow">
+      <span style="font-size:14px;color:var(--border-strong)">↓</span>
+      <div class="arrow-label">유저스토리 도출 직후 → JIRA Epic · Story 선등록 <span class="badge badge-ai">AI 자동화</span></div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-section-label">JIRA 백로그 선등록</div>
+      <div class="backlog-bar"><div class="backlog-dot"></div>Story는 껍데기만 — 유저스토리 문장 + AC 초안만 포함. 화면 링크·TC·Sub-task는 이후 Phase에서 채움.</div>
+      <div class="step-row"><div class="step-group">
+        <div class="step key">
+          <div class="step-num">04</div>
+          <div class="step-name">JIRA Epic · Story 선등록</div>
+          <div class="step-desc">US 1개 → Story 1개 · 유저스토리 문장 + AC 초안 · 우선순위 설정 · 배포 ETA 연결</div>
+          <div class="step-note">개발팀이 기획 초반부터 과제 범위 공유. Story는 이후 Phase마다 업데이트.</div>
+          <div class="fill-row">
+            <span class="fill-chip fill-done">Phase 1: US + AC 초안</span>
+            <span style="color:var(--border-strong);font-size:10px">→</span>
+            <span class="fill-chip fill-now">Phase 2: 화면·TC 추가</span>
+            <span style="color:var(--border-strong);font-size:10px">→</span>
+            <span class="fill-chip fill-later">Phase 3: Sub-task 분기</span>
+          </div>
+          <div class="step-output">JIRA Epic + Story (초안)</div>
+          <div class="badges"><span class="badge badge-ai">AI 자동화</span><span class="badge badge-pm">PM 확인</span></div>
+          <div class="ai-detail">
+            <button class="ai-toggle-btn" onclick="toggleAI(this)">
+              <span>✦ AI 활용 — JIRA Story 초안 자동 생성</span><span class="chevron">▾</span>
+            </button>
+            <div class="ai-detail-body">
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">방법 1 — Rovo MCP (Confluence 연동 시)</div>
+                <div>Claude에 Atlassian Rovo MCP가 연결된 경우, 프롬프트만으로 JIRA에 직접 등록 가능.</div>
+                <pre>다음 유저스토리를 JIRA Story로 등록해줘.
+
+[유저스토리 문서 붙여넣기]
+
+규칙:
+- US 1개 = Story 1개
+- Story 제목: [US-{번호}] {스토리 제목}
+- 본문: 유저스토리 문장 + AC 초안 전체
+- 우선순위: High/Medium/Low 판단해서 설정
+- Epic 링크: {Epic 번호}
+- Sub-task는 지금 생성하지 않음 (Phase 2에서 추가)</pre>
+              </div>
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">방법 2 — 수동 등록용 초안 생성</div>
+                <pre>위 유저스토리를 JIRA Story 등록용 텍스트로 변환해줘.
+Story별로 제목 / 본문 / 우선순위를 구분해서 출력해줘.
+복사해서 JIRA에 바로 붙여넣을 수 있는 형식으로.</pre>
+              </div>
+              <div class="ai-detail-tip">✅ 등록 후 PM이 Epic 연결·담당자·스프린트를 직접 설정.</div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-section-label">TC 초안 자동 생성</div>
+      <div class="step-row"><div class="step-group">
+        <div class="step ai-step">
+          <div class="step-num">05</div>
+          <div class="step-name">TC 초안 자동 생성</div>
+          <div class="step-desc">AC(Given/When/Then) → TC 변환 · Open Items 보류 항목 제외 · 경계값 케이스 추가</div>
+          <div class="step-output">TC 초안 (Phase 2에서 확정)</div>
+          <div class="badges"><span class="badge badge-ai">AI 자동화</span><span class="badge badge-qa">QA 검토</span></div>
+          <div class="ai-detail">
+            <button class="ai-toggle-btn" onclick="toggleAI(this)">
+              <span>✦ AI 활용 — TC 자동 생성 프롬프트</span><span class="chevron">▾</span>
+            </button>
+            <div class="ai-detail-body">
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">프롬프트</div>
+                <pre>다음 유저스토리의 인수 조건(Given/When/Then)을 기반으로 TC를 생성해줘.
+
+[유저스토리 문서 붙여넣기]
+
+규칙:
+- 각 AC → 1개 이상의 TC
+- TC 형식: TC-ID / 시나리오 / Given / When / Then / 우선순위(High·Medium·Low)
+- Open Items "보류" 항목은 TC 생성 제외 → 문서 말미 "보류 TC" 섹션으로 별도 표기
+- 숫자 입력·시간 기반 로직은 경계값 TC 추가 생성
+- BO 화면 TC는 별도 섹션으로 분리</pre>
+              </div>
+              <div class="ai-detail-tip">✅ QA 담당자가 TC 검토 후 누락 케이스 추가. Open Items 확정 시 보류 TC 재생성.</div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Phase 2 -->
+<div class="phase phase-2">
+  <div class="phase-rail">
+    <span class="phase-tag">Phase 2</span>
+    <span class="phase-name">상세기획 /<br>UX기획</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-title">업무 플로우 · 화면 설계 · Story 상세 채움</div>
+    <div class="phase-subtitle">산출물: TechSpec · Screen Spec · UI 목업 · TC 확정 · JIRA Story 업데이트</div>
+
+    <div class="sub-section">
+      <div class="sub-section-label">업무 플로우 & TechSpec</div>
+      <div class="step-row"><div class="step-group">
+        <div class="step">
+          <div class="step-num">06</div>
+          <div class="step-name">업무 플로우 & TechSpec 작성</div>
+          <div class="step-desc">단계별 담당자 · 구현 구분(🔵신규/🟡확장/🟢기존) · API 인터페이스 · 데이터 모델 · 처리 시나리오</div>
+          <div class="step-output">TechSpec 하위 문서</div>
+          <div class="badges"><span class="badge badge-pm">PM</span><span class="badge badge-be">BE</span><span class="badge badge-fe">FE</span></div>
+          <div class="ai-detail">
+            <button class="ai-toggle-btn" onclick="toggleAI(this)">
+              <span>✦ AI 활용 — 처리 시나리오·API 초안 보조</span><span class="chevron">▾</span>
+            </button>
+            <div class="ai-detail-body">
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">활용 시점</div>
+                <div>유저스토리와 정책서를 인풋으로 주면 AI가 업무 플로우와 API 스펙 초안을 제안해줌. 개발팀과 협의 전 초안 작성용.</div>
+              </div>
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">프롬프트</div>
+                <pre>다음 유저스토리와 정책서를 바탕으로 TechSpec 초안을 작성해줘.
+
+[유저스토리 문서 붙여넣기]
+[정책서 문서 붙여넣기]
+
+요청 항목:
+1. 업무 플로우 (단계 / 담당 / 행동 / 시스템 / 구현 구분 🔵🟡🟢)
+2. API 인터페이스 초안 (Endpoint / Request / Response 성공·실패)
+3. 데이터 모델 추가 필드
+4. 주요 처리 시나리오 (Happy path + Fail path)</pre>
+              </div>
+              <div class="ai-detail-tip">✅ 초안은 반드시 BE·FE와 협의 후 확정. AI 제안을 그대로 쓰지 않는다.</div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <hr class="inner-divider">
+
+    <div class="sub-section">
+      <div class="sub-section-label">화면 상세 기획 (Screen Spec)</div>
+      <div class="step-row"><div class="step-group">
+        <div class="step">
+          <div class="step-num">07</div>
+          <div class="step-name">Screen Spec 작성</div>
+          <div class="step-desc">화면별 URL · 화면 상태 목록(S1-A…) · 컴포넌트 변경 사항 · 필드 정의 · 에러/엣지 케이스</div>
+          <div class="step-output">Screen 하위 문서 (지면별)</div>
+          <div class="badges"><span class="badge badge-pm">PM</span><span class="badge badge-design">디자인</span></div>
+          <div class="ai-detail">
+            <button class="ai-toggle-btn" onclick="toggleAI(this)">
+              <span>✦ AI 활용 — 화면 상태 목록·에러 케이스 도출</span><span class="chevron">▾</span>
+            </button>
+            <div class="ai-detail-body">
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">프롬프트</div>
+                <pre>다음 유저스토리와 정책서를 바탕으로 Screen Spec 초안을 작성해줘.
+
+[유저스토리 문서 붙여넣기]
+[정책서 문서 붙여넣기]
+
+요청 항목:
+1. 화면 구조 개요 (화면명 / URL / 구분 🔵🟡🟢 / 관련 US)
+2. 각 화면의 상태 목록
+   - 상태 ID (S1-A, S1-B…)
+   - 상태명 / 진입 조건 / UI 노출 요소 / TC 여부
+3. 에러·엣지 케이스 목록
+   - 케이스 / 팝업 메시지 / 화면 전환
+4. 미결 사항</pre>
+              </div>
+              <div class="ai-detail-tip">✅ 상태 목록이 완전해야 UI 목업과 TC가 완전하게 도출됨. PM이 누락 상태 직접 추가.</div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+
+      <div class="step-arrow">
+        <span style="font-size:14px;color:var(--border-strong)">↓</span>
+        <div class="arrow-label">Screen Spec → UI 목업 자동 생성 (상태별 1화면, 375px 기준) <span class="badge badge-claude-design">Claude Design</span></div>
+      </div>
+
+      <div class="step-row"><div class="step-group">
+        <div class="step ai-step">
+          <div class="step-num">08</div>
+          <div class="step-name">UI 목업 자동 생성</div>
+          <div class="step-desc">화면 상태 목록 단위 화면 생성 · 팝업/에러 UI 포함 · 모바일 375px 기준</div>
+          <div class="step-output">정적 UI 목업</div>
+          <div class="badges"><span class="badge badge-claude-design">Claude Design</span></div>
+          <div class="ai-detail">
+            <button class="ai-toggle-btn" onclick="toggleAI(this)">
+              <span>✦ Claude Design — UI 목업 생성 프롬프트</span><span class="chevron">▾</span>
+            </button>
+            <div class="ai-detail-body">
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">프롬프트</div>
+                <pre>다음 Screen Spec을 기반으로 화면 UI 목업을 생성해줘.
+
+[Screen Spec 문서 붙여넣기]
+
+규칙:
+- 화면 상태 목록의 각 상태(S1-A, S1-B…)를 개별 화면으로 생성
+- 각 화면에 상태 ID와 상태명을 레이블로 표시
+- 컴포넌트 변경 사항의 "신규"·"수정" 항목 반영
+- 에러/엣지 케이스의 팝업 메시지를 팝업 UI로 표현
+- 모바일 375px 기준
+- 차별화상회 디자인 시스템 톤 (간결·실용적)</pre>
+              </div>
+              <div class="ai-detail-tip">✅ Claude Design 전용. Gemini 등 타 AI는 UI 렌더링 불가 — 이 단계는 Claude 사용.</div>
+            </div>
+          </div>
+        </div>
+        <div class="step ai-step">
+          <div class="step-num">09</div>
+          <div class="step-name">FE 정적 산출물</div>
+          <div class="step-desc">로직 없는 정적 지면 한정 · HTML/CSS 코드 생성 · FE 로직 연결 기반으로 활용</div>
+          <div class="step-output">HTML/CSS 파일</div>
+          <div class="badges"><span class="badge badge-ai">AI 자동화</span><span class="badge badge-fe">FE 검토</span></div>
+          <div class="ai-detail">
+            <button class="ai-toggle-btn" onclick="toggleAI(this)">
+              <span>✦ AI 활용 — 정적 HTML/CSS 생성</span><span class="chevron">▾</span>
+            </button>
+            <div class="ai-detail-body">
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">적용 범위</div>
+                <div>로직(API 연동, 상태 관리)이 없는 정적 지면만 해당. 동적 로직이 있는 화면은 FE가 직접 구현.</div>
+              </div>
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">프롬프트</div>
+                <pre>다음 UI 목업을 기반으로 FE 정적 HTML/CSS 파일을 생성해줘.
+
+[UI 목업 또는 Screen Spec 붙여넣기]
+
+규칙:
+- 순수 HTML/CSS만 사용 (JS 최소화)
+- 반응형: 모바일 375px 기준, 최대 768px
+- 컴포넌트 변경 사항의 신규/수정 항목 반영
+- API 연동 부분은 주석으로 표시
+- FE가 로직 연결 시 수정하기 쉬운 구조로</pre>
+              </div>
+              <div class="ai-detail-tip">✅ Claude·Gemini 모두 사용 가능. FE 담당자가 코드 검토 후 로직 연결.</div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">10</div>
+          <div class="step-name">피그마 확정</div>
+          <div class="step-desc">목업 기반 디자인 보완 · 컴포넌트 정의 · 디자인 시스템 반영</div>
+          <div class="step-output">피그마 링크</div>
+          <div class="badges"><span class="badge badge-design">디자인</span></div>
+        </div>
+      </div></div>
+    </div>
+
+    <hr class="inner-divider">
+
+    <div class="sub-section">
+      <div class="sub-section-label">JIRA Story 상세 업데이트 & TC 확정</div>
+      <div class="step-row"><div class="step-group">
+        <div class="step key">
+          <div class="step-num">11</div>
+          <div class="step-name">JIRA Story 상세 채움</div>
+          <div class="step-desc">피그마 링크 · Screen Spec 링크 · AC 최종 업데이트 · Sub-task 분기(FE/BE/디자인/QA)</div>
+          <div class="step-note">Phase 1 선등록 Story에 상세 내용 추가. 개발팀 Sub-task 이 시점에 생성.</div>
+          <div class="step-output">JIRA Story 완성</div>
+          <div class="badges"><span class="badge badge-pm">PM</span><span class="badge badge-ai">AI 자동화</span></div>
+          <div class="ai-detail">
+            <button class="ai-toggle-btn" onclick="toggleAI(this)">
+              <span>✦ AI 활용 — Sub-task 분기 초안 생성</span><span class="chevron">▾</span>
+            </button>
+            <div class="ai-detail-body">
+              <div class="ai-detail-section">
+                <div class="ai-detail-label">프롬프트</div>
+                <pre>다음 유저스토리와 TechSpec을 기반으로 JIRA Sub-task 목록을 생성해줘.
+
+[유저스토리 문서 붙여넣기]
+[TechSpec 업무 플로우 붙여넣기]
+
+Sub-task 분기 기준:
+- FE: Screen Spec에 화면 변경이 있는 US
+- BE: TechSpec 플로우에 🔵/🟡 항목이 있는 US
+- 디자인: Screen Spec에 신규 UI가 있는 US
+- QA: TC 생성 가능인 US 전체
+
+출력 형식: US별로 Sub-task 제목 목록</pre>
+              </div>
+              <div class="ai-detail-tip">✅ Sub-task 담당자·마감일은 PM이 직접 설정.</div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">12</div>
+          <div class="step-name">TC 보완 & 확정</div>
+          <div class="step-desc">UI·플로우·정책서 최종 반영 TC 추가 · Open Items 확정 시 보류 TC 생성 · QA 우선순위 설정</div>
+          <div class="step-output">확정 TC 목록</div>
+          <div class="badges"><span class="badge badge-pm">PM</span><span class="badge badge-qa">QA</span></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="loop-note">
+      <span class="loop-icon">↻</span>
+      <span>PRD 보완 루프 — UI 검토 중 요구사항 변경 시: Screen Spec → Claude Design 재생성 → JIRA Story AC 업데이트 → TC 재생성. 정책 변경 시 정책서 → 유저스토리 AC → TC 순으로 연쇄 업데이트.</span>
+    </div>
+  </div>
+</div>
+
+<!-- Phase 3 -->
+<div class="phase phase-3">
+  <div class="phase-rail">
+    <span class="phase-tag">Phase 3</span>
+    <span class="phase-name">개발</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-title">구현 · GitHub 연결</div>
+    <div class="phase-subtitle">JIRA Story 등록·상세화 완료 — 개발 착수만 하면 됨</div>
+    <div class="step-row"><div class="step-group">
+      <div class="step">
+        <div class="step-num">13</div>
+        <div class="step-name">BE 구현</div>
+        <div class="step-desc">TechSpec 기반 · API · DB · 배치 로직</div>
+        <div class="step-output">BE 코드 · PR</div>
+        <div class="badges"><span class="badge badge-be">BE</span></div>
+      </div>
+      <div class="step">
+        <div class="step-num">14</div>
+        <div class="step-name">FE 구현</div>
+        <div class="step-desc">정적 산출물 기반 · 로직 연결 · API 연동</div>
+        <div class="step-output">FE 코드 · PR</div>
+        <div class="badges"><span class="badge badge-fe">FE</span></div>
+      </div>
+      <div class="step">
+        <div class="step-num">15</div>
+        <div class="step-name">GitHub ↔ JIRA 연결</div>
+        <div class="step-desc">PR에 JIRA 이슈 번호 태깅 · 배포 브랜치 연결 · 상태 자동 업데이트</div>
+        <div class="step-output">PR ↔ JIRA 연결</div>
+        <div class="badges"><span class="badge badge-fe">FE</span><span class="badge badge-be">BE</span></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- Phase 4 -->
+<div class="phase phase-4">
+  <div class="phase-rail">
+    <span class="phase-tag">Phase 4</span>
+    <span class="phase-name">QA & 배포</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-title">TC 기반 테스트 · 배포</div>
+    <div class="phase-subtitle">확정 TC 기반 실행 — 결함 발생 시 JIRA 버그 티켓으로 추적</div>
+    <div class="step-row"><div class="step-group">
+      <div class="step">
+        <div class="step-num">16</div>
+        <div class="step-name">TC 기반 테스트</div>
+        <div class="step-desc">Phase 2 확정 TC 실행 · 결함 시 JIRA 버그 티켓 등록 · PRD 변경 시 Screen Spec → TC 재확인</div>
+        <div class="step-output">QA 결과 리포트</div>
+        <div class="badges"><span class="badge badge-qa">QA</span><span class="badge badge-pm">PM</span></div>
+      </div>
+    </div></div>
+    <div class="step-arrow">
+      <span style="font-size:14px;color:var(--border-strong)">↓</span>
+      <div class="arrow-label">QA 통과 확인 후 배포</div>
+    </div>
+    <div class="step-row"><div class="step-group">
+      <div class="step">
+        <div class="step-num">17</div>
+        <div class="step-name">배포</div>
+        <div class="step-desc">배포 완료 · 배포 일시 기록 · Confluence [진행] 유지 — Phase 5 완료 후 [완료] 변경</div>
+        <div class="step-output">배포 완료 · Phase 5 시작</div>
+        <div class="badges"><span class="badge badge-pm">PM</span><span class="badge badge-fe">FE</span><span class="badge badge-be">BE</span></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- Phase 5 -->
+<div class="phase phase-5">
+  <div class="phase-rail">
+    <span class="phase-tag">Phase 5</span>
+    <span class="phase-name">배포 후<br>운영 확인</span>
+  </div>
+  <div class="phase-body">
+    <div class="phase-title">기능 운영 확인 · KR 달성 여부 · 문서 종료</div>
+    <div class="phase-subtitle">배포 후 2~4주. 이상 없음 확인 + KR 기록 후 [완료] 처리.</div>
+
+    <div class="step-row"><div class="step-group">
+      <div class="step after-step">
+        <div class="step-num">18</div>
+        <div class="step-name">기능 운영 확인</div>
+        <div class="step-desc">배포 후 이상 징후 모니터링 · 에러율·이탈율 급변 여부 확인 · 사용자 피드백 수집 · 결함 발생 시 핫픽스 처리.</div>
+        <div class="step-note" style="color:var(--phase5);background:var(--fe-bg);font-size:11px;padding:5px 8px;border-radius:5px;margin-bottom:7px">Type A는 수치 비교보다 "기능이 의도대로 동작하는가"가 핵심. 오류·이탈·사용자 반응을 중심으로 확인.</div>
+        <div class="step-output">운영 확인 완료</div>
+        <div class="badges"><span class="badge badge-pm">PM</span><span class="badge badge-be">BE</span><span class="badge badge-fe">FE</span></div>
+      </div>
+      <div class="step after-step">
+        <div class="step-num">19</div>
+        <div class="step-name">KR 달성 여부 기록 & 문서 종료</div>
+        <div class="step-desc">최상위 문서 KR 달성 여부 확인 및 기록 · Confluence [진행] → [완료] · JIRA Epic 종료 · 배포 결과 공유.</div>
+        <div class="step-output">과제 종료</div>
+        <div class="badges"><span class="badge badge-pm">PM</span></div>
+        <div class="ai-detail">
+          <button class="ai-toggle-btn" onclick="toggleAI(this)"><span>✦ AI 활용 — 배포 후 회고 보조</span><span class="chevron">▾</span></button>
+          <div class="ai-detail-body">
+            <div class="ai-detail-label">프롬프트</div>
+            <pre>다음 과제 정보를 바탕으로 배포 후 회고 문서 초안을 작성해줘.
+
+[최상위 문서 붙여넣기]
+
+요청:
+1. KR 달성 여부 요약 (달성 / 부분 달성 / 미달성)
+2. 잘 된 점 (기획·개발·협업 관점)
+3. 아쉬운 점 및 개선 제안
+4. 후속 과제로 등록이 필요한 항목
+5. 한 줄 요약 (다음 과제 기획 시 참고할 핵심 인사이트)</pre>
+            <div class="ai-detail-tip">✅ 회고 문서는 최상위 페이지 하단 또는 별도 하위 페이지로 작성.</div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+      <div style="border:1px solid var(--pm);background:var(--pm-bg);border-radius:8px;padding:10px 12px">
+        <div style="font-size:11px;font-weight:600;color:var(--pm);margin-bottom:5px">✅ 정상 운영</div>
+        <div style="font-size:11px;color:var(--text-2);line-height:1.6">Confluence [완료]<br>JIRA Epic 종료<br>KR 달성 수치 기록</div>
+      </div>
+      <div style="border:1px solid var(--data);background:var(--data-bg);border-radius:8px;padding:10px 12px">
+        <div style="font-size:11px;font-weight:600;color:var(--data);margin-bottom:5px">🔶 부분 달성</div>
+        <div style="font-size:11px;color:var(--text-2);line-height:1.6">Confluence [완료]<br>미달성 항목 원인 분석<br>후속 과제 등록 검토</div>
+      </div>
+      <div style="border:1px solid var(--qa);background:var(--qa-bg);border-radius:8px;padding:10px 12px">
+        <div style="font-size:11px;font-weight:600;color:var(--qa);margin-bottom:5px">❌ 이슈 발생</div>
+        <div style="font-size:11px;color:var(--text-2);line-height:1.6">핫픽스 처리 후 [완료]<br>이슈 원인 분석 문서 작성<br>재발 방지 방안 기록</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <span class="legend-label">담당</span>
+  <span class="badge badge-pm">PM</span>
+  <span class="badge badge-design">디자인</span>
+  <span class="badge badge-fe">FE</span>
+  <span class="badge badge-be">BE</span>
+  <span class="badge badge-qa">QA</span>
+  <span class="badge badge-ai">AI 자동화</span>
+  <span class="badge badge-claude-design">Claude Design</span>
+  <span class="badge badge-policy">정책 확인</span>
+  <span class="badge badge-after">배포 후 확인</span>
+  <div class="legend-sep"></div>
+  <span class="legend-note">✦ 버튼 = AI 활용 상세 보기 | After 확인 = Phase 5 전용</span>
+</div>
+
+</div>
+
+<script>
+function toggleAI(btn) {
+  btn.classList.toggle('open');
+  var body = btn.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>

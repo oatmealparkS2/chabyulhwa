@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__atlassian__getConfluencePage",
+      "Read(//Users/sfn/.claude/**)",
+      "Bash(mkdir -p .claude/skills)",
+      "Bash(mv ~/.claude/skills/prd-quality-guard .claude/skills/prd-quality-guard)",
+      "Bash(rmdir ~/.claude/skills)",
+      "Bash(curl -s \"https://code.claude.com/docs/en/settings.md\")",
+      "Bash(curl -s \"https://code.claude.com/docs/en/how-claude-code-works.md\")",
+      "Bash(curl -s \"https://code.claude.com/docs/llms.txt\")"
+    ]
+  }
+}

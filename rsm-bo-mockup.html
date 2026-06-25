@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가격 관리 — BO 화면 프로토타입</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;color:#1a1a1a;background:#F5F6FA;}
+.layout{display:flex;height:100vh;}
+.sidebar{width:200px;background:#1E1E2D;flex-shrink:0;padding:16px 0;}
+.sidebar-logo{color:#fff;font-size:14px;font-weight:600;padding:0 16px 20px;border-bottom:1px solid #2e2e40;margin-bottom:8px;}
+.sidebar-item{padding:8px 16px;color:#9395A5;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:8px;}
+.sidebar-item:hover,.sidebar-item.active{background:#7B5CFA22;color:#fff;}
+.sidebar-item i{font-size:16px;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:48px;background:#fff;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;padding:0 20px;gap:8px;}
+.topbar-title{font-size:14px;color:#6B7280;}
+.topbar-sep{color:#D1D5DB;}
+.topbar-cur{font-size:14px;font-weight:500;color:#111827;}
+.tab-bar{display:flex;border-bottom:1px solid #E5E7EB;background:#fff;padding:0 20px;gap:0;}
+.tab-item{padding:12px 18px;font-size:13px;font-weight:500;color:#6B7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.tab-item:hover{color:#374151;}
+.tab-item.active{color:#7B5CFA;border-bottom-color:#7B5CFA;}
+.tab-item i{font-size:15px;}
+.content{flex:1;overflow-y:auto;padding:20px;}
+.screen{background:#fff;border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;margin-bottom:16px;}
+.page-hd{padding:12px 18px;border-bottom:1px solid #E5E7EB;font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;background:#fff;}
+.btn-back{background:none;border:1px solid #E5E7EB;cursor:pointer;color:#6B7280;font-size:12px;display:flex;align-items:center;gap:3px;padding:4px 10px;border-radius:6px;}
+.btn-back:hover{background:#F9FAFB;color:#374151;}
+.toolbar{display:flex;gap:7px;padding:10px 18px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;flex-wrap:wrap;align-items:center;}
+input[type=text],input[type=date],input[type=number]{background:#fff;border:1px solid #D1D5DB;border-radius:6px;padding:4px 9px;font-size:12px;color:#111827;height:30px;font-family:inherit;}
+input:focus{outline:none;border-color:#7B5CFA;box-shadow:0 0 0 3px #7B5CFA18;}
+input.ro{background:#F9FAFB;color:#6B7280;}
+.btn{cursor:pointer;border-radius:6px;font-size:12px;height:30px;padding:0 13px;font-family:inherit;border:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font-weight:500;}
+.bp{background:#7B5CFA;color:#fff;}.bp:hover{background:#6B4DEA;}
+.bo{background:#fff;border:1px solid #D1D5DB;color:#374151;}.bo:hover{background:#F9FAFB;}
+.bd{background:#374151;color:#fff;}.bd:hover{background:#1F2937;}
+.total-row{padding:7px 18px;font-size:12px;border-bottom:1px solid #E5E7EB;background:#fff;}
+.tc{color:#E24B4A;font-weight:600;}
+.dt{width:100%;border-collapse:collapse;}
+.dt th{padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;border-bottom:1px solid #E5E7EB;background:#F9FAFB;white-space:nowrap;letter-spacing:0.02em;}
+.dt td{padding:8px 12px;font-size:12px;border-bottom:1px solid #F3F4F6;white-space:nowrap;}
+.dt tbody tr:hover td{background:#F9FAFB;cursor:pointer;}
+.dt tbody tr.sel td{background:#EEF0FF!important;}
+.dt tr:last-child td{border-bottom:none;}
+.lnk{color:#7B5CFA;font-weight:500;}
+.lnk:hover{text-decoration:underline;}
+.fr{display:flex;align-items:center;padding:10px 18px;border-bottom:1px solid #F3F4F6;gap:10px;flex-wrap:wrap;background:#fff;}
+.fl{font-size:12px;color:#6B7280;width:120px;flex-shrink:0;}
+.sec-div{padding:9px 18px;font-size:12px;font-weight:600;background:#F9FAFB;border-top:1px solid #E5E7EB;border-bottom:1px solid #E5E7EB;color:#374151;text-transform:uppercase;letter-spacing:0.04em;}
+.ref-wrap{padding:10px 18px;background:#EEF8FF;border-bottom:1px solid #BFDBFE;}
+.ref-label{font-size:11px;color:#3B82F6;font-weight:600;margin-bottom:6px;}
+.ref-chips{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{border:1px solid #BFDBFE;border-radius:6px;padding:5px 11px;font-size:11px;background:#fff;display:flex;gap:5px;align-items:center;}
+.cl{color:#6B7280;}
+.cv{font-weight:600;color:#111827;}
+.cv.hi{color:#7B5CFA;}
+.save-bar{padding:10px 18px;display:flex;gap:8px;border-top:1px solid #E5E7EB;background:#F9FAFB;}
+.callout{background:#EFF6FF;border-left:3px solid #3B82F6;padding:8px 12px;font-size:12px;color:#1D4ED8;margin:10px 18px;border-radius:0 6px 6px 0;}
+.tbl-wrap{overflow-x:auto;}
+.prod-form{padding:12px 18px;border-bottom:1px solid #E5E7EB;background:#fff;}
+.prod-form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fl2{font-size:11px;color:#6B7280;font-weight:500;}
+.fl2 .req{color:#E24B4A;}
+.ico-btn{background:none;border:none;cursor:pointer;padding:3px 6px;font-size:15px;line-height:1;border-radius:4px;}
+.ico-edit{color:#9CA3AF;}.ico-edit:hover{color:#7B5CFA;background:#EEF0FF;}
+.ico-del{color:#9CA3AF;}.ico-del:hover{color:#E24B4A;background:#FEF2F2;}
+.bx{border-radius:4px;padding:2px 8px;font-size:11px;font-weight:500;}
+.bx.tax{background:#EEF2FF;color:#4338CA;}
+.bx.free{background:#F3F4F6;color:#6B7280;}
+.hp{color:#7B5CFA;font-weight:600;}
+.empty{text-align:center;padding:28px;color:#9CA3AF;font-size:12px;}
+.ro-band{display:flex;gap:0;flex-wrap:wrap;padding:10px 18px;border-bottom:1px solid #F3F4F6;}
+.ro-item{display:flex;gap:6px;align-items:baseline;font-size:12px;padding:3px 20px 3px 0;}
+.ro-lbl{color:#9CA3AF;white-space:nowrap;font-size:11px;}
+.ro-val{color:#111827;font-weight:500;}
+.price-tbl{border-collapse:collapse;width:auto;margin:2px 0;}
+.price-tbl th{padding:5px 18px 5px 0;font-size:11px;font-weight:500;color:#6B7280;text-align:right;border-bottom:1px solid #E5E7EB;white-space:nowrap;}
+.price-tbl td{padding:6px 18px 6px 0;font-size:12px;font-weight:500;text-align:right;color:#111827;}
+.price-tbl td.ai{color:#2563EB;}
+.price-tbl td.max{color:#7B5CFA;font-weight:600;}
+.toast{position:fixed;bottom:24px;right:24px;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:999;transition:opacity .3s;pointer-events:none;}
+.toast.ok{background:#ECFDF5;color:#065F46;border:1px solid #A7F3D0;}
+.toast.err{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;}
+.toast.info{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE;}
+.row-actions{display:flex;gap:2px;justify-content:center;}
+#toast{display:none;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #E5E7EB;}
+.fg-cell{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid #F3F4F6;}
+.fg-cell:nth-child(odd){border-right:1px solid #F3F4F6;}
+.fg-label{font-size:12px;color:#6B7280;width:112px;flex-shrink:0;}
+.fg-val{flex:1;}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;}
+.modal{background:#fff;border-radius:10px;width:660px;max-height:78vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.2);}
+.modal-hd{padding:13px 18px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;flex-shrink:0;}
+.modal-body{flex:1;overflow-y:auto;}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">차별화상회 BO</div>
+    <div class="sidebar-item"><i class="ti ti-home"></i> 홈</div>
+    <div class="sidebar-item"><i class="ti ti-users"></i> 회원 관리</div>
+    <div class="sidebar-item active"><i class="ti ti-tag"></i> 가격 관리</div>
+    <div class="sidebar-item"><i class="ti ti-clipboard-list"></i> 주문 관리</div>
+    <div class="sidebar-item"><i class="ti ti-chart-bar"></i> 통계</div>
+    <div class="sidebar-item"><i class="ti ti-settings"></i> 설정</div>
+  </div>
+
+  <div class="main">
+    <!-- Top bar -->
+    <div class="topbar">
+      <span class="topbar-title">가격 관리</span>
+      <span class="topbar-sep">/</span>
+      <span class="topbar-cur" id="topbar-label">고객별 고정가 관리</span>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar" id="tab-bar">
+      <div class="tab-item active" id="tab-fixed" onclick="switchTab('fixed')">
+        <i class="ti ti-users"></i> 고객별 고정가 관리
+      </div>
+      <div class="tab-item" id="tab-product" onclick="switchTab('product')">
+        <i class="ti ti-tag"></i> 상품별 가격관리
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ① 고객 목록 -->
+      <div id="view-list" class="screen">
+        <div class="page-hd">고객별고정가 관리</div>
+        <div class="toolbar">
+          <input type="text" id="s-name" placeholder="상호명" style="width:110px;">
+          <input type="text" id="s-code" placeholder="회원코드" style="width:130px;">
+          <button class="btn bp" onclick="doSearch()"><i class="ti ti-search"></i> 검색</button>
+          <button class="btn bp" style="margin-left:auto;" onclick="goNewCust()"><i class="ti ti-plus"></i> 고객 추가</button>
+          <button class="btn bo" onclick="alert('준비 중입니다.')"><i class="ti ti-download"></i> 엑셀다운로드</button>
+          <button class="btn bd" onclick="alert('준비 중입니다.')"><i class="ti ti-upload"></i> 일괄업로드</button>
+        </div>
+        <div class="total-row">Total : <span class="tc" id="list-cnt">3</span></div>
+        <table class="dt">
+          <thead><tr>
+            <th>상호명</th><th>회원코드</th>
+            <th>적용기간 시작일</th><th>적용기간 종료일</th>
+            <th>등록상품수</th><th>등록일</th><th></th>
+          </tr></thead>
+          <tbody id="cust-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- ③ 상품별 가격관리 -->
+      <div id="view-product-price" style="display:none;" class="screen">
+        <div class="page-hd">상품별 가격관리</div>
+
+        <div class="toolbar">
+          <input type="text" id="pp-search-id"  placeholder="상품ID" style="width:95px;">
+          <input type="text" id="pp-search-ecd" placeholder="상품ERP코드" style="width:120px;">
+          <input type="text" id="pp-search-nm"  placeholder="상품명" style="width:160px;">
+          <button class="btn bp" onclick="ppSearch()"><i class="ti ti-search"></i> 검색</button>
+          <button class="btn bo" onclick="ppReset()">초기화</button>
+          <div style="margin-left:auto;display:flex;gap:7px;">
+            <button class="btn bo" id="pp-edit-btn" onclick="ppToggleEditMode()"><i class="ti ti-pencil"></i> 일괄수정</button>
+            <button class="btn bp" id="pp-save-btn" style="display:none;" onclick="ppSaveAll()"><i class="ti ti-device-floppy"></i> 저장</button>
+            <button class="btn bo" id="pp-cancel-btn" style="display:none;" onclick="ppCancelEdit()"><i class="ti ti-x"></i> 취소</button>
+            <button class="btn bo" onclick="alert('준비 중입니다.')"><i class="ti ti-download"></i> 엑셀다운로드</button>
+          </div>
+        </div>
+
+        <div class="total-row">Total : <span class="tc" id="pp-cnt">0</span></div>
+
+        <div class="tbl-wrap">
+          <table class="dt" style="min-width:900px;">
+            <thead><tr>
+              <th>상품ERP코드</th><th>상품ID</th><th>상품명</th><th>정가</th>
+              <th>고객별고정가</th>
+              <th>상호</th><th>회원코드</th>
+              <th>시작일</th><th>종료일</th>
+            </tr></thead>
+            <tbody id="pp-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ② 고객 상세 -->
+      <div id="view-detail" style="display:none;" class="screen">
+        <div class="page-hd">
+          <button class="btn-back" onclick="goList()"><i class="ti ti-arrow-left"></i> 목록으로</button>
+          <span id="detail-hd-label">고객별고정가 상세</span>
+        </div>
+
+        <div class="fr">
+          <span class="fl">상호명</span>
+          <input type="text" id="d-name"  style="width:185px;" onblur="custAutoFill(this)">
+          <span class="fl" style="margin-left:20px;">회원코드</span>
+          <input type="text" id="d-mcode" style="width:135px;" onblur="custAutoFill(this)">
+        </div>
+        <div class="fr">
+          <span class="fl">적용기간 시작일</span>
+          <input type="date" id="d-start" style="width:143px;">
+          <span class="fl" style="margin-left:20px;">적용기간 종료일</span>
+          <input type="date" id="d-end" style="width:143px;">
+        </div>
+        <div class="callout">
+          <i class="ti ti-info-circle"></i>
+          적용기간은 <strong>고객 단위</strong>로 설정하며, 등록된 모든 상품에 동일하게 적용됩니다. 기간 수정 시 전체 상품에 즉시 반영됩니다.
+        </div>
+        <div class="save-bar">
+          <button class="btn bp" id="d-save-cust-btn" onclick="saveCust()">수정하기</button>
+        </div>
+
+        <div id="prod-section">
+          <!-- ▲ 상단: 상품 등록 / 수정 폼 -->
+          <div id="pf-area">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 18px;border-top:1px solid #E5E7EB;border-bottom:1px solid #E5E7EB;background:#F9FAFB;">
+              <span style="font-size:12px;font-weight:600;color:#374151;">상품 등록 / 수정</span>
+              <span id="pf-mode-badge" style="font-size:11px;background:#EEF0FF;color:#7B5CFA;padding:2px 10px;border-radius:20px;font-weight:500;">신규</span>
+            </div>
+            <div class="form-grid">
+              <div class="fg-cell">
+                <span class="fg-label">상품ID / ERP코드</span>
+                <div style="display:flex;gap:5px;flex:1;">
+                  <input type="text" id="pf-q" placeholder="ID 또는 ERP코드 입력 후 Enter" class="fg-val" onkeydown="if(event.key==='Enter')pfQuickLookup()">
+                  <button class="btn bo" style="height:30px;padding:0 9px;flex-shrink:0;" onclick="openProductSearchModal()" title="검색으로 찾기"><i class="ti ti-search"></i></button>
+                </div>
+              </div>
+              <div class="fg-cell">
+                <span class="fg-label">상품명</span>
+                <input type="text" id="pf-nm" class="ro fg-val" readonly placeholder="-">
+              </div>
+              <div class="fg-cell">
+                <span class="fg-label">과세여부</span>
+                <input type="text" id="pf-tax" class="ro fg-val" readonly placeholder="-">
+              </div>
+              <div class="fg-cell">
+                <span class="fg-label">정가</span>
+                <input type="text" id="pf-lp" class="ro fg-val" readonly placeholder="-">
+              </div>
+              <div class="fg-cell">
+                <span class="fg-label">AI기본쿠폰금액</span>
+                <input type="text" id="pf-ai-base" class="ro fg-val" readonly placeholder="-" style="color:#2563EB;">
+              </div>
+              <div class="fg-cell">
+                <span class="fg-label">AI개인화쿠폰금액</span>
+                <input type="text" id="pf-ai" class="ro fg-val" readonly placeholder="-" style="color:#2563EB;">
+              </div>
+              <div class="fg-cell">
+                <span class="fg-label">최대할인가</span>
+                <input type="text" id="pf-md-price" class="ro fg-val" readonly placeholder="-" style="color:#7B5CFA;font-weight:600;">
+              </div>
+              <div class="fg-cell">
+                <span class="fg-label">고객별고정가 <span style="color:#E24B4A;">*</span></span>
+                <input type="number" id="pf-fp" placeholder="금액 입력" class="fg-val">
+              </div>
+            </div>
+            <div style="padding:10px 18px;display:flex;gap:8px;border-top:1px solid #E5E7EB;">
+              <button class="btn bo" onclick="pfClear()"><i class="ti ti-file-plus"></i> 신규</button>
+              <button class="btn bp" onclick="pfSave()"><i class="ti ti-device-floppy"></i> 저장</button>
+            </div>
+          </div>
+
+          <!-- ▼ 하단: 상품 목록 -->
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 18px;border-top:1px solid #E5E7EB;border-bottom:1px solid #E5E7EB;background:#F9FAFB;">
+              <span style="font-size:12px;font-weight:600;color:#374151;">고객별고정가 상품 목록</span>
+              <div style="display:flex;gap:7px;">
+                <button class="btn bo"  style="height:26px;font-size:11px;" id="d-edit-btn"   onclick="detailToggleEdit()"><i class="ti ti-pencil"></i> 일괄수정</button>
+                <button class="btn bp"  style="height:26px;font-size:11px;display:none;" id="d-save-btn"   onclick="detailSaveAll()"><i class="ti ti-device-floppy"></i> 저장</button>
+                <button class="btn bo"  style="height:26px;font-size:11px;display:none;" id="d-cancel-btn" onclick="detailCancelEdit()"><i class="ti ti-x"></i> 취소</button>
+                <button class="btn bo"  style="height:26px;font-size:11px;" onclick="alert('준비 중입니다.')"><i class="ti ti-download"></i> 엑셀다운로드</button>
+                <button class="btn bd"  style="height:26px;font-size:11px;" onclick="alert('준비 중입니다.')"><i class="ti ti-upload"></i> 엑셀업로드</button>
+              </div>
+            </div>
+            <div class="total-row">Total : <span class="tc" id="prod-cnt">0</span></div>
+            <div class="tbl-wrap">
+              <table class="dt" style="min-width:640px;">
+                <thead><tr>
+                  <th>상품ERP코드</th><th>상품ID</th><th>상품명</th><th>과세여부</th>
+                  <th>정가</th><th>고객별고정가</th><th>등록일</th><th>수정일</th>
+                  <th style="text-align:center;">삭제</th>
+                </tr></thead>
+                <tbody id="prod-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ④ 상품 등록/수정 -->
+      <div id="view-product-edit" style="display:none;" class="screen">
+        <div class="page-hd">
+          <button class="btn-back" onclick="goDetailFromEdit()"><i class="ti ti-arrow-left"></i> 고객 상세로</button>
+          <span id="pe-mode-label">상품 등록</span>
+        </div>
+
+        <!-- 대상 고객 (read-only) -->
+        <div class="ro-band" style="background:#F9FAFB;border-bottom:1px solid #E5E7EB;">
+          <div class="ro-item"><span class="ro-lbl">상호명</span><span class="ro-val" id="pe-cnm">-</span></div>
+          <div class="ro-item"><span class="ro-lbl">회원코드</span><span class="ro-val" id="pe-mc">-</span></div>
+          <div class="ro-item"><span class="ro-lbl">적용기간</span><span class="ro-val" id="pe-period">-</span></div>
+        </div>
+
+        <!-- 상품 검색 (신규 등록 시만 표시) -->
+        <div id="pe-search-area" style="border-top:1px solid #E5E7EB;">
+          <div class="toolbar">
+            <input type="text" id="pe-q-id"  placeholder="상품ID" style="width:100px;">
+            <input type="text" id="pe-q-ecd" placeholder="상품ERP코드" style="width:120px;">
+            <input type="text" id="pe-q-nm"  placeholder="상품명" style="width:180px;">
+            <button class="btn bp" onclick="peSearch()"><i class="ti ti-search"></i> 검색</button>
+            <button class="btn bo" onclick="peClearSearch()">초기화</button>
+          </div>
+
+          <!-- 검색 결과 -->
+          <div id="pe-results" style="display:none;">
+            <div style="padding:6px 18px;font-size:12px;color:#6B7280;border-bottom:1px solid #E5E7EB;background:#F9FAFB;">
+              검색결과 <span class="tc" id="pe-res-cnt">0</span>건 — 상품을 클릭해 선택하세요
+            </div>
+            <div class="tbl-wrap">
+              <table class="dt" style="min-width:500px;">
+                <thead><tr><th>상품ID</th><th>상품ERP코드</th><th>상품명</th><th>과세여부</th><th>정가</th></tr></thead>
+                <tbody id="pe-res-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 선택된 상품 정보 + 가격 참고 + 입력 -->
+        <div id="ref-bar" style="display:none;">
+          <!-- 선택 상품 (read-only) -->
+          <div class="ro-band" style="border-top:1px solid #E5E7EB;">
+            <div class="ro-item"><span class="ro-lbl">상품ID</span><span class="ro-val" id="r-pid">-</span></div>
+            <div class="ro-item"><span class="ro-lbl">ERP코드</span><span class="ro-val" id="p-ecd">-</span></div>
+            <div class="ro-item"><span class="ro-lbl">상품명</span><span class="ro-val" id="p-nm">-</span></div>
+            <div class="ro-item"><span class="ro-lbl">과세여부</span><span class="ro-val" id="r-tax">-</span></div>
+            <div style="margin-left:auto;display:flex;align-items:center;">
+              <button id="pe-reselect-btn" class="btn bo" style="height:24px;font-size:11px;padding:0 10px;" onclick="openProductSearchModal()"><i class="ti ti-refresh"></i> 다시 선택</button>
+            </div>
+          </div>
+
+          <!-- 가격 참고 (table row) -->
+          <div style="padding:10px 18px;border-bottom:1px solid #F3F4F6;">
+            <div style="font-size:11px;color:#9CA3AF;margin-bottom:8px;">가격 참고</div>
+            <table class="price-tbl">
+              <thead><tr>
+                <th>정가</th><th>판매가</th><th>AI기본쿠폰금액</th><th>AI개인화쿠폰금액</th><th>최대할인가</th>
+              </tr></thead>
+              <tbody><tr>
+                <td id="r-lp">-</td>
+                <td id="r-sp">-</td>
+                <td class="ai" id="r-ai-base">-</td>
+                <td class="ai" id="r-ai-val">-</td>
+                <td class="max" id="r-md">-</td>
+              </tr></tbody>
+            </table>
+          </div>
+
+          <!-- 고객별고정가 입력 -->
+          <div class="fr">
+            <span class="fl">고객별고정가 <span style="color:#E24B4A;">*</span></span>
+            <input type="number" id="p-fp" placeholder="금액 입력" style="width:150px;">
+            <span style="font-size:12px;color:#6B7280;margin-left:4px;">원</span>
+          </div>
+        </div>
+
+        <div class="save-bar">
+          <button class="btn bp" onclick="saveProd()"><i class="ti ti-device-floppy"></i> 저장</button>
+          <button class="btn bo" onclick="goDetailFromEdit()">취소</button>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- 상품 검색 모달 -->
+<div id="modal-product-search" class="modal-bg" style="display:none;" onclick="if(event.target===this)closeProductModal()">
+  <div class="modal">
+    <div class="modal-hd">
+      상품 검색
+      <button class="ico-btn ico-del" style="font-size:18px;" onclick="closeProductModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="toolbar">
+        <input type="text" id="m-q-id"  placeholder="상품ID"      style="width:100px;">
+        <input type="text" id="m-q-ecd" placeholder="상품ERP코드" style="width:128px;">
+        <input type="text" id="m-q-nm"  placeholder="상품명"       style="width:185px;">
+        <button class="btn bp" onclick="mSearch()"><i class="ti ti-search"></i> 검색</button>
+        <button class="btn bo" onclick="mClear()">초기화</button>
+      </div>
+      <div id="m-results" style="display:none;">
+        <div style="padding:6px 18px;font-size:12px;color:#6B7280;border-bottom:1px solid #E5E7EB;background:#F9FAFB;">
+          검색결과 <span class="tc" id="m-cnt">0</span>건 — 상품을 클릭해 선택하세요
+        </div>
+        <div class="tbl-wrap">
+          <table class="dt" style="min-width:500px;">
+            <thead><tr><th>상품ID</th><th>상품ERP코드</th><th>상품명</th><th>과세여부</th><th>정가</th></tr></thead>
+            <tbody id="m-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script>
+const f = n => n != null ? Number(n).toLocaleString() : '-';
+const td = () => new Date().toISOString().slice(0,10);
+const $ = id => document.getElementById(id);
+
+const catalog = {
+  '5106703':{ecd:'ERP-A001',nm:'국내산 흙대파 특 10kg/PK',      tax:'과세',lp:29340,sp:20500,aiBase:2000,ai:1500,md:19000},
+  '5106171':{ecd:'ERP-A002',nm:'국내산 햇양파 1번구 특 15kg/EA', tax:'과세',lp:15780,sp:11270,aiBase:1200,ai:800, md:10470},
+  '5114687':{ecd:'ERP-A003',nm:'[3개묶음]국내산 햇양파 특 15kg/EA',tax:'면세',lp:15780,sp:10800,aiBase:1000,ai:700, md:10100},
+  '5106694':{ecd:'ERP-A004',nm:'국내산 양파 2번구 15kg/EA',      tax:'면세',lp:15780,sp:11030,aiBase:1100,ai:900, md:10130},
+  '5115566':{ecd:'ERP-B001',nm:'국내산 와일드 루꼴라 1kg/PK',   tax:'면세',lp:33200,sp:23200,aiBase:2500,ai:2000,md:21200},
+  '1100381':{ecd:'ERP-B002',nm:'국내산 와일드 루꼴라 500g/PK',  tax:'면세',lp:18260,sp:12760,aiBase:1300,ai:1000,md:11760},
+  '5106308':{ecd:'ERP-C001',nm:'국내산 양상추(개별포장) 500g/EA',tax:'과세',lp:3220, sp:2250, aiBase:300, ai:200, md:2050},
+  '5112284':{ecd:'ERP-C002',nm:'국내산 양상추 벌크 1eax12/box', tax:'과세',lp:29580,sp:20680,aiBase:2100,ai:1800,md:18880},
+  '5106576':{ecd:'ERP-C003',nm:'국내산 부추 특 500gx2/PK',      tax:'면세',lp:3540, sp:2470, aiBase:400, ai:300, md:2170},
+  '5106563':{ecd:'ERP-A005',nm:'국내산 청경채 특 4kg/box',       tax:'과세',lp:6230, sp:4350, aiBase:500, ai:400, md:3950},
+};
+// ERP코드 → pid 역색인
+const catalogByEcd = Object.fromEntries(Object.entries(catalog).map(([pid,c])=>[c.ecd, {pid,...c}]));
+
+let custs = [
+  {id:1,nm:'㈜맛있는부엌',mc:'user_2041',ec:'ERP-00231',sd:'2026-06-01',ed:'2026-12-31',rd:'2026-05-28'},
+  {id:2,nm:'더키친푸드㈜',mc:'user_3872',ec:'ERP-00198',sd:'2026-07-01',ed:'2026-12-31',rd:'2026-06-20'},
+  {id:3,nm:'프레시팜㈜',mc:'user_1190',ec:'ERP-00115',sd:'2025-06-01',ed:'2026-05-31',rd:'2025-05-15'},
+];
+
+let prods = {
+  1:[
+    {pid:'5106703',ecd:'ERP-A001',nm:'국내산 흙대파 특 10kg/PK',tax:'과세',lp:29340,fp:20500,rd:'2026-06-01',md:'2026-06-01'},
+    {pid:'5106171',ecd:'ERP-A002',nm:'국내산 햇양파 1번구 특 15kg/EA',tax:'과세',lp:15780,fp:11270,rd:'2026-06-01',md:'2026-06-15'},
+    {pid:'5114687',ecd:'ERP-A003',nm:'[3개묶음]국내산 햇양파 특 15kg/EA',tax:'면세',lp:15780,fp:10800,rd:'2026-06-01',md:'2026-06-01'},
+    {pid:'5106694',ecd:'ERP-A004',nm:'국내산 양파 2번구 15kg/EA',tax:'면세',lp:15780,fp:11030,rd:'2026-06-01',md:'2026-06-01'},
+  ],
+  2:[
+    {pid:'5115566',ecd:'ERP-B001',nm:'국내산 와일드 루꼴라 1kg/PK',tax:'면세',lp:33200,fp:23200,rd:'2026-06-20',md:'2026-06-20'},
+    {pid:'1100381',ecd:'ERP-B002',nm:'국내산 와일드 루꼴라 500g/PK',tax:'면세',lp:18260,fp:12760,rd:'2026-06-20',md:'2026-06-20'},
+  ],
+  3:[
+    {pid:'5106308',ecd:'ERP-C001',nm:'국내산 양상추(개별포장) 500g/EA',tax:'과세',lp:3220,fp:2250,rd:'2025-05-15',md:'2025-05-15'},
+    {pid:'5112284',ecd:'ERP-C002',nm:'국내산 양상추 벌크 1eax12/box',tax:'과세',lp:29580,fp:20680,rd:'2025-05-15',md:'2025-05-15'},
+    {pid:'5106576',ecd:'ERP-C003',nm:'국내산 부추 특 500gx2/PK',tax:'면세',lp:3540,fp:2470,rd:'2025-05-15',md:'2025-05-15'},
+  ],
+};
+
+let curCid = null, editPid = null, toastTimer = null, custMode = 'edit';
+
+function toast(msg, type='ok') {
+  const t = $('toast');
+  t.textContent = msg; t.className = 'toast ' + type; t.style.display = 'block'; t.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.style.opacity = '0'; setTimeout(()=>{t.style.display='none';},300); }, 2800);
+}
+
+function renderCusts(list) {
+  const tb = $('cust-tbody');
+  $('list-cnt').textContent = list.length;
+  if (!list.length) { tb.innerHTML='<tr><td colspan="8" class="empty">검색 결과가 없습니다</td></tr>'; return; }
+  tb.innerHTML = list.map(c => {
+    const cnt = (prods[c.id]||[]).length;
+    return `<tr onclick="goDetail(${c.id})">
+      <td class="lnk">${c.nm}</td>
+      <td>${c.mc}</td>
+      <td>${c.sd}</td><td>${c.ed}</td>
+      <td>${cnt}개</td><td>${c.rd}</td>
+      <td><div class="row-actions">
+        <button class="ico-btn ico-edit" onclick="event.stopPropagation();goDetail(${c.id})" title="수정"><i class="ti ti-edit"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function doSearch() {
+  const nm = $('s-name').value.toLowerCase();
+  const cd = $('s-code').value.toLowerCase();
+  renderCusts(custs.filter(c => {
+    if (nm && !c.nm.toLowerCase().includes(nm)) return false;
+    if (cd && !c.mc.toLowerCase().includes(cd) && !c.ec.toLowerCase().includes(cd)) return false;
+    return true;
+  }));
+}
+
+function showOnly(id) {
+  ['view-list','view-detail','view-product-price','view-product-edit'].forEach(v => {
+    $(v).style.display = v===id ? 'block' : 'none';
+  });
+}
+
+function goDetail(cid) {
+  curCid = cid; editPid = null; custMode = 'edit';
+  const c = custs.find(x=>x.id===cid);
+  $('d-name').value=c.nm; $('d-mcode').value=c.mc;
+  $('d-start').value=c.sd; $('d-end').value=c.ed;
+  $('topbar-label').textContent = c.nm + ' — 고객별 고정가';
+  $('detail-hd-label').textContent = '고객별고정가 상세';
+  $('d-save-cust-btn').textContent = '수정하기';
+  $('prod-section').style.display = 'block';
+  renderProds();
+  showOnly('view-detail');
+}
+
+function goNewCust() {
+  curCid = null; editPid = null; custMode = 'new';
+  $('d-name').value=''; $('d-mcode').value='';
+  $('d-start').value=''; $('d-end').value='';
+  $('topbar-label').textContent = '고객 추가';
+  $('detail-hd-label').textContent = '고객 추가';
+  $('d-save-cust-btn').textContent = '등록하기';
+  $('prod-section').style.display = 'none';
+  showOnly('view-detail');
+}
+
+function goList() {
+  $('topbar-label').textContent = '고객별 고정가 관리';
+  showOnly('view-list');
+  renderCusts(custs);
+}
+
+function goDetailFromEdit() {
+  detailEditMode = false;
+  $('d-edit-btn').style.display   = 'inline-flex';
+  $('d-save-btn').style.display   = 'none';
+  $('d-cancel-btn').style.display = 'none';
+  renderProds(false);
+  showOnly('view-detail');
+}
+
+function goProductEdit(pid) {
+  // pid = null → 신규, pid = '...' → 수정
+  editPid = pid;
+  const c = custs.find(x=>x.id===curCid);
+
+  const label = pid ? '상품 수정' : '상품 등록';
+  $('pe-mode-label').textContent = label;
+  $('topbar-label').textContent  = label;
+  $('pe-cnm').textContent    = c.nm;
+  $('pe-mc').textContent     = c.mc;
+  $('pe-period').textContent = c.sd + ' ~ ' + c.ed;
+
+  // 검색 영역: 신규=표시, 수정=숨김
+  $('pe-search-area').style.display = pid ? 'none' : 'block';
+  $('pe-reselect-btn').style.display = pid ? 'none' : 'inline-flex';
+
+  // 폼 초기화
+  $('p-fp').value = '';
+  clearRef();
+  $('pe-results').style.display = 'none';
+  $('pe-q-id').value=''; $('pe-q-ecd').value=''; $('pe-q-nm').value='';
+
+  if (pid) {
+    // 수정: 선택 상품 바로 표시
+    const p = (prods[curCid]||[]).find(x=>x.pid===pid);
+    $('p-id') && ($('p-id').value = pid);
+    $('p-fp').value = p.fp;
+    peShowProductInfo(pid);
+  }
+
+  showOnly('view-product-edit');
+  $('p-id').readOnly ? $('p-fp').focus() : $('p-id').focus();
+}
+
+function custAutoFill(input) {
+  if (custMode !== 'new') return;
+  const val = input.value.trim().toLowerCase();
+  if (!val) return;
+  let found = null;
+  if (input.id === 'd-name')  found = custs.find(c => c.nm.toLowerCase().includes(val));
+  if (input.id === 'd-mcode') found = custs.find(c => c.mc.toLowerCase().includes(val));
+  if (!found) return;
+  $('d-name').value  = found.nm;
+  $('d-mcode').value = found.mc;
+  toast('고객 정보를 불러왔습니다.', 'info');
+}
+
+function saveCust() {
+  const nm=$('d-name').value.trim(), mc=$('d-mcode').value.trim();
+  const sd=$('d-start').value, ed=$('d-end').value;
+  if (!nm) { toast('상호명을 입력하세요.', 'err'); return; }
+  if (!sd) { toast('적용기간 시작일을 입력하세요.', 'err'); return; }
+  if (!ed) { toast('적용기간 종료일을 입력하세요.', 'err'); return; }
+  if (ed < sd) { toast('종료일은 시작일 이후여야 합니다.', 'err'); return; }
+
+  if (custMode === 'new') {
+    const newId = Math.max(...custs.map(c=>c.id)) + 1;
+    custs.push({id:newId, nm, mc, sd, ed, rd:td()});
+    prods[newId] = [];
+    curCid = newId; custMode = 'edit';
+    $('detail-hd-label').textContent = '고객별고정가 상세';
+    $('d-save-cust-btn').textContent = '수정하기';
+    $('topbar-label').textContent = nm + ' — 고객별 고정가';
+    $('prod-section').style.display = 'block';
+    renderProds();
+    toast('고객이 등록되었습니다.');
+  } else {
+    const c = custs.find(x=>x.id===curCid);
+    c.nm=nm; c.mc=mc; c.sd=sd; c.ed=ed;
+    toast('고객 정보가 수정되었습니다.');
+  }
+}
+
+// --- 상품 검색 모달 ---
+function openProductSearchModal() {
+  $('m-q-id').value=''; $('m-q-ecd').value=''; $('m-q-nm').value='';
+  $('m-results').style.display = 'none';
+  $('modal-product-search').style.display = 'flex';
+  setTimeout(()=>$('m-q-nm').focus(), 50);
+}
+
+function closeProductModal() {
+  $('modal-product-search').style.display = 'none';
+}
+
+function mClear() {
+  $('m-q-id').value=''; $('m-q-ecd').value=''; $('m-q-nm').value='';
+  $('m-results').style.display = 'none';
+}
+
+function mSearch() {
+  const qid  = $('m-q-id').value.trim().toLowerCase();
+  const qecd = $('m-q-ecd').value.trim().toLowerCase();
+  const qnm  = $('m-q-nm').value.trim().toLowerCase();
+  if (!qid && !qecd && !qnm) { toast('검색어를 하나 이상 입력하세요.', 'err'); return; }
+
+  const results = Object.entries(catalog).filter(([pid, c]) => {
+    if (qid  && !pid.toLowerCase().includes(qid))    return false;
+    if (qecd && !c.ecd.toLowerCase().includes(qecd)) return false;
+    if (qnm  && !c.nm.toLowerCase().includes(qnm))   return false;
+    return true;
+  });
+
+  $('m-cnt').textContent = results.length;
+  $('m-results').style.display = 'block';
+  const tb = $('m-tbody');
+  if (!results.length) {
+    tb.innerHTML = '<tr><td colspan="5" class="empty">검색 결과가 없습니다</td></tr>'; return;
+  }
+  tb.innerHTML = results.map(([pid, c]) => `
+    <tr onclick="mSelectProduct('${pid}')" style="cursor:pointer;">
+      <td class="lnk">${pid}</td>
+      <td>${c.ecd}</td>
+      <td>${c.nm}</td>
+      <td><span class="bx ${c.tax==='과세'?'tax':'free'}">${c.tax}</span></td>
+      <td>${f(c.lp)}</td>
+    </tr>`).join('');
+}
+
+// --- 상단 폼 (pf-*) ---
+let pfSelectedPid = null, pfMode = 'new';
+
+function mSelectProduct(pid) {
+  closeProductModal();
+  pfSetProduct(pid);
+}
+
+function pfQuickLookup() {
+  const q = $('pf-q').value.trim();
+  if (!q) return;
+  if (catalog[q])           { pfSetProduct(q);             return; }
+  if (catalogByEcd[q])      { pfSetProduct(catalogByEcd[q].pid); return; }
+  // partial match
+  const hit = Object.entries(catalog).find(([pid,c]) =>
+    pid.includes(q) || c.ecd.toLowerCase().includes(q.toLowerCase()) || c.nm.toLowerCase().includes(q.toLowerCase())
+  );
+  if (hit) { pfSetProduct(hit[0]); return; }
+  toast('상품을 찾을 수 없습니다.', 'err');
+}
+
+function pfSetProduct(pid) {
+  const cat = catalog[pid];
+  if (!cat) return;
+  pfSelectedPid = pid;
+  $('pf-q').value         = pid;
+  $('pf-nm').value        = cat.nm;
+  $('pf-tax').value       = cat.tax;
+  $('pf-lp').value        = f(cat.lp) + '원';
+  const hasAi = cat.ai > 0;
+  $('pf-ai-base').value   = hasAi ? '-' : f(cat.aiBase) + '원';
+  $('pf-ai').value        = hasAi ? f(cat.ai) + '원' : '-';
+  $('pf-md-price').value  = f(cat.md) + '원';
+  if (pfMode === 'new') $('pf-fp').value = '';
+  setTimeout(()=>$('pf-fp').focus(), 30);
+}
+
+function pfClear() {
+  pfSelectedPid = null; pfMode = 'new';
+  ['pf-q','pf-nm','pf-tax','pf-lp','pf-ai-base','pf-ai','pf-md-price','pf-fp'].forEach(id=>$(id).value='');
+  $('pf-mode-badge').textContent = '신규';
+  $('pf-mode-badge').style.background = '#EEF0FF';
+  $('pf-mode-badge').style.color = '#7B5CFA';
+  document.querySelectorAll('#prod-tbody tr.sel').forEach(r=>r.classList.remove('sel'));
+}
+
+function pfEditProd(pid) {
+  if (detailEditMode) return;
+  const prod = (prods[curCid]||[]).find(p=>p.pid===pid);
+  if (!prod) return;
+  pfMode = 'edit'; pfSelectedPid = pid;
+  pfSetProduct(pid);
+  $('pf-fp').value = prod.fp;
+  $('pf-mode-badge').textContent = '수정 중';
+  $('pf-mode-badge').style.background = '#FEF3C7';
+  $('pf-mode-badge').style.color = '#92400E';
+  document.querySelectorAll('#prod-tbody tr').forEach(r=>r.classList.toggle('sel', r.dataset.pid===pid));
+  $('pf-area').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function pfSave() {
+  if (!pfSelectedPid) { toast('상품을 선택하세요.', 'err'); return; }
+  const fp = Number($('pf-fp').value);
+  if (!fp || fp <= 0) { toast('고객별고정가는 0보다 커야 합니다.', 'err'); return; }
+  const list = prods[curCid] || (prods[curCid]=[]);
+  if (pfMode === 'edit') {
+    const idx = list.findIndex(p=>p.pid===pfSelectedPid);
+    if (idx!==-1) { list[idx].fp=fp; list[idx].md=td(); }
+    toast('고객별고정가가 수정되었습니다.');
+  } else {
+    if (list.some(p=>p.pid===pfSelectedPid)) { toast('이미 등록된 상품입니다.', 'err'); return; }
+    const cat = catalog[pfSelectedPid];
+    list.push({pid:pfSelectedPid,ecd:cat.ecd,nm:cat.nm,tax:cat.tax,lp:cat.lp,fp,rd:td(),md:td()});
+    toast('상품이 등록되었습니다.');
+  }
+  pfClear();
+  renderProds(false);
+}
+
+// --- 상품 등록 화면 검색/선택 ---
+function peSearch() {
+  const qid  = $('pe-q-id').value.trim().toLowerCase();
+  const qecd = $('pe-q-ecd').value.trim().toLowerCase();
+  const qnm  = $('pe-q-nm').value.trim().toLowerCase();
+  if (!qid && !qecd && !qnm) { toast('검색어를 하나 이상 입력하세요.', 'err'); return; }
+
+  const results = Object.entries(catalog).filter(([pid, c]) => {
+    if (qid  && !pid.toLowerCase().includes(qid))        return false;
+    if (qecd && !c.ecd.toLowerCase().includes(qecd))     return false;
+    if (qnm  && !c.nm.toLowerCase().includes(qnm))       return false;
+    return true;
+  });
+
+  $('pe-res-cnt').textContent = results.length;
+  $('pe-results').style.display = 'block';
+  $('ref-bar').style.display = 'none';
+
+  const tb = $('pe-res-tbody');
+  if (!results.length) {
+    tb.innerHTML = '<tr><td colspan="5" class="empty">검색 결과가 없습니다</td></tr>'; return;
+  }
+  tb.innerHTML = results.map(([pid, c]) => `
+    <tr onclick="peSelectProduct('${pid}')" style="cursor:pointer;">
+      <td class="lnk">${pid}</td>
+      <td>${c.ecd}</td>
+      <td>${c.nm}</td>
+      <td><span class="bx ${c.tax==='과세'?'tax':'free'}">${c.tax}</span></td>
+      <td>${f(c.lp)}</td>
+    </tr>`).join('');
+}
+
+function peClearSearch() {
+  $('pe-q-id').value=''; $('pe-q-ecd').value=''; $('pe-q-nm').value='';
+  $('pe-results').style.display = 'none';
+  $('ref-bar').style.display = 'none';
+}
+
+function peReselect() {
+  $('ref-bar').style.display = 'none';
+  $('pe-search-area').style.display = 'block';
+  // 검색 결과가 있으면 그대로 유지
+  if ($('pe-results').style.display !== 'none') return;
+  $('pe-q-id').focus();
+}
+
+function peSelectProduct(pid) {
+  peShowProductInfo(pid);
+  // 선택 행 강조
+  document.querySelectorAll('#pe-res-tbody tr').forEach(r =>
+    r.classList.toggle('sel', r.querySelector('.lnk')?.textContent === pid));
+}
+
+function peShowProductInfo(pid) {
+  const cat = catalog[pid];
+  if (!cat) return;
+  $('p-id') && ($('p-id').value = pid);   // saveProd에서 사용
+  $('r-pid').textContent     = pid;
+  $('p-ecd').textContent     = cat.ecd;
+  $('p-nm').textContent      = cat.nm;
+  $('r-tax').textContent     = cat.tax;
+  $('r-lp').textContent  = f(cat.lp)+'원';
+  $('r-sp').textContent  = f(cat.sp)+'원';
+  const hasAi = cat.ai > 0;
+  $('r-ai-base').textContent = hasAi ? '-' : f(cat.aiBase)+'원';
+  $('r-ai-val').textContent  = hasAi ? f(cat.ai)+'원' : '-';
+  $('r-md').textContent  = f(cat.md)+'원';
+  $('ref-bar').style.display = 'block';
+  $('p-fp').focus();
+}
+
+function lookupProd() { peSearch(); }  // 하위 호환
+
+function clearRef() {
+  $('ref-bar').style.display = 'none';
+}
+
+function resetForm() {
+  editPid=null;
+  $('p-id').value=''; $('p-id').readOnly=false;
+  clearRef(); $('p-fp').value='';
+}
+
+function saveProd() {
+  const pid = $('r-pid').textContent.trim();
+  const fpv = $('p-fp').value;
+  if (!pid || pid==='-' || $('ref-bar').style.display==='none') { toast('상품을 검색하여 선택하세요.', 'err'); return; }
+  if (!fpv || Number(fpv) <= 0) { toast('고객별고정가는 0보다 커야 합니다.', 'err'); return; }
+  const list = prods[curCid] || (prods[curCid]=[]);
+  const cat = catalog[pid];
+
+  if (editPid) {
+    const idx = list.findIndex(p=>p.pid===editPid);
+    if (idx!==-1) { list[idx].fp=Number(fpv); list[idx].md=td(); }
+    toast('고객별고정가가 수정되었습니다.');
+  } else {
+    if (list.some(p=>p.pid===pid)) { toast('이미 해당 고객에 동일 상품이 등록되어 있습니다.', 'err'); return; }
+    list.push({pid,ecd:cat.ecd,nm:cat.nm,tax:cat.tax,lp:cat.lp,fp:Number(fpv),rd:td(),md:td()});
+    toast('상품이 등록되었습니다.');
+  }
+  goDetailFromEdit();
+}
+
+let detailEditMode = false;
+
+function detailToggleEdit() {
+  detailEditMode = true;
+  pfClear();
+  $('d-edit-btn').style.display   = 'none';
+  $('d-save-btn').style.display   = 'inline-flex';
+  $('d-cancel-btn').style.display = 'inline-flex';
+  $('pf-area').style.display      = 'none';
+  renderProds(true);
+  const first = document.querySelector('.d-fp-input');
+  if (first) first.focus();
+}
+
+function detailCancelEdit() {
+  detailEditMode = false;
+  $('d-edit-btn').style.display   = 'inline-flex';
+  $('d-save-btn').style.display   = 'none';
+  $('d-cancel-btn').style.display = 'none';
+  $('pf-area').style.display      = 'block';
+  renderProds(false);
+}
+
+function detailSaveAll() {
+  const inputs = document.querySelectorAll('.d-fp-input');
+  let hasError = false;
+  inputs.forEach(inp => {
+    if (!inp.value || Number(inp.value) <= 0) { inp.style.borderColor='#E24B4A'; hasError=true; }
+    else inp.style.borderColor='';
+  });
+  if (hasError) { toast('고객별고정가는 0보다 커야 합니다.', 'err'); return; }
+  inputs.forEach(inp => {
+    const pid = inp.dataset.pid;
+    const list = prods[curCid]||[];
+    const idx  = list.findIndex(p => p.pid === pid);
+    if (idx !== -1) { list[idx].fp = Number(inp.value); list[idx].md = td(); }
+  });
+  detailCancelEdit();
+  toast(`${inputs.length}건 고객별고정가가 일괄 수정되었습니다.`);
+}
+
+function delProd(pid) {
+  if (!confirm('삭제하시겠습니까?\n이력은 보존됩니다.')) return;
+  prods[curCid] = (prods[curCid]||[]).filter(p=>p.pid!==pid);
+  renderProds(detailEditMode); toast('삭제되었습니다.');
+}
+
+function renderProds(editMode=false) {
+  const list = prods[curCid]||[];
+  $('prod-cnt').textContent = list.length;
+  const tb = $('prod-tbody');
+  if (!list.length) { tb.innerHTML='<tr><td colspan="9" class="empty">등록된 상품이 없습니다. 위 폼에서 상품을 검색하여 추가하세요.</td></tr>'; return; }
+  tb.innerHTML = list.map(p=>`<tr data-pid="${p.pid}" ${editMode ? '' : `onclick="pfEditProd('${p.pid}')" style="cursor:pointer;"`}>
+    <td>${p.ecd}</td>
+    <td>${p.pid}</td>
+    <td style="max-width:190px;overflow:hidden;text-overflow:ellipsis;">${p.nm}</td>
+    <td><span class="bx ${p.tax==='과세'?'tax':'free'}">${p.tax}</span></td>
+    <td>${f(p.lp)}</td>
+    <td>${editMode
+      ? `<input type="number" class="d-fp-input" data-pid="${p.pid}" value="${p.fp}" style="width:108px;height:26px;font-size:12px;">`
+      : `<span class="hp">${f(p.fp)}</span>`}</td>
+    <td>${p.rd}</td>
+    <td>${editMode ? `<span style="color:#9CA3AF;font-size:11px;">대기</span>` : p.md}</td>
+    <td><div class="row-actions"><button class="ico-btn ico-del" onclick="event.stopPropagation();delProd('${p.pid}')" title="삭제"><i class="ti ti-trash"></i></button></div></td>
+  </tr>`).join('');
+}
+
+// --- 탭 전환 ---
+let activeTab = 'fixed';
+function switchTab(tab) {
+  activeTab = tab;
+  $('tab-fixed').classList.toggle('active', tab==='fixed');
+  $('tab-product').classList.toggle('active', tab==='product');
+  const isFixed = tab === 'fixed';
+  $('view-list').style.display = isFixed ? 'block' : 'none';
+  $('view-detail').style.display = 'none';
+  $('view-product-edit').style.display = 'none';
+  $('view-product-price').style.display = isFixed ? 'none' : 'block';
+  $('topbar-label').textContent = isFixed ? '고객별 고정가 관리' : '상품별 가격관리';
+  if (isFixed) {
+    renderCusts(custs);
+  } else {
+    ppCurrentRows = ppBuildRows();
+    ppExitEditMode();
+    ppRenderTable(false);
+  }
+}
+
+// --- 상품별 가격관리 (flat: 상품×고객 행) ---
+let ppEditMode = false;
+let ppCurrentRows = []; // 현재 표시 중인 행
+
+function ppBuildRows() {
+  // 전체 상품×고객 조합 flat list
+  const rows = [];
+  custs.forEach(c => {
+    (prods[c.id]||[]).forEach(p => {
+      rows.push({
+        pid: p.pid, ecd: p.ecd, nm: p.nm, tax: p.tax, lp: p.lp,
+        cid: c.id, cnm: c.nm, mc: c.mc, sd: c.sd, ed: c.ed,
+        fp: p.fp, rd: p.rd, md: p.md
+      });
+    });
+  });
+  // 최신 수정일 순, 수정일 없으면 최신 등록일 순
+  rows.sort((a, b) => {
+    const da = a.md || a.rd;
+    const db = b.md || b.rd;
+    return db.localeCompare(da);
+  });
+  return rows;
+}
+
+function ppReset() {
+  ['pp-search-id','pp-search-ecd','pp-search-nm'].forEach(id => { $(id).value=''; });
+  ppEditMode = false;
+  ppExitEditMode();
+  ppCurrentRows = ppBuildRows();
+  ppRenderTable(false);
+}
+
+function ppSearch() {
+  const qid  = $('pp-search-id').value.trim().toLowerCase();
+  const qecd = $('pp-search-ecd').value.trim().toLowerCase();
+  const qnm  = $('pp-search-nm').value.trim().toLowerCase();
+  ppCurrentRows = ppBuildRows().filter(r => {
+    if (qid  && !r.pid.toLowerCase().includes(qid))   return false;
+    if (qecd && !r.ecd.toLowerCase().includes(qecd))  return false;
+    if (qnm  && !r.nm.toLowerCase().includes(qnm))    return false;
+    return true;
+  });
+  ppExitEditMode();
+  ppRenderTable(false);
+}
+
+function ppRenderTable(editMode) {
+  const rows = ppCurrentRows;
+  $('pp-cnt').textContent = rows.length;
+  const tb = $('pp-tbody');
+  if (!rows.length) {
+    tb.innerHTML = '<tr><td colspan="10" class="empty">검색 결과가 없습니다</td></tr>';
+    return;
+  }
+  tb.innerHTML = rows.map((r, i) => `<tr data-idx="${i}">
+    <td>${r.ecd}</td>
+    <td>${r.pid}</td>
+    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${r.nm}</td>
+    <td>${f(r.lp)}</td>
+    <td>${editMode
+      ? `<input type="number" class="pp-fp-input" data-idx="${i}" value="${r.fp}" style="width:108px;height:26px;font-size:12px;">`
+      : `<span class="hp">${f(r.fp)}</span>`}</td>
+    <td>${r.cnm}</td>
+    <td>${r.mc}</td>
+    <td>${r.sd}</td>
+    <td>${r.ed}</td>
+  </tr>`).join('');
+}
+
+function ppToggleEditMode() {
+  ppEditMode = true;
+  $('pp-edit-btn').style.display = 'none';
+  $('pp-save-btn').style.display = 'inline-flex';
+  $('pp-cancel-btn').style.display = 'inline-flex';
+  ppRenderTable(true);
+  const first = document.querySelector('.pp-fp-input');
+  if (first) first.focus();
+}
+
+function ppExitEditMode() {
+  ppEditMode = false;
+  $('pp-edit-btn').style.display = 'inline-flex';
+  $('pp-save-btn').style.display = 'none';
+  $('pp-cancel-btn').style.display = 'none';
+}
+
+function ppCancelEdit() {
+  ppExitEditMode();
+  ppRenderTable(false);
+}
+
+function ppSaveAll() {
+  const inputs = document.querySelectorAll('.pp-fp-input');
+  let hasError = false;
+  inputs.forEach(inp => {
+    if (!inp.value || Number(inp.value) <= 0) { inp.style.borderColor='#E24B4A'; hasError=true; }
+    else inp.style.borderColor='';
+  });
+  if (hasError) { toast('고객별고정가는 0보다 커야 합니다.', 'err'); return; }
+
+  inputs.forEach(inp => {
+    const idx = Number(inp.dataset.idx);
+    const r = ppCurrentRows[idx];
+    const fp = Number(inp.value);
+    const list = prods[r.cid]||[];
+    const pidx = list.findIndex(p => p.pid === r.pid);
+    if (pidx !== -1) { list[pidx].fp = fp; list[pidx].md = td(); r.fp = fp; r.md = td(); }
+  });
+
+  ppExitEditMode();
+  ppRenderTable(false);
+  toast(`${inputs.length}건 고객별고정가가 일괄 수정되었습니다.`);
+}
+
+// 엔터키 지원
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeProductModal();
+  if (e.key !== 'Enter') return;
+  if (['m-q-id','m-q-ecd','m-q-nm'].includes(document.activeElement.id)) mSearch();
+  if (['pe-q-id','pe-q-ecd','pe-q-nm'].includes(document.activeElement.id)) peSearch();
+  if (['pp-search-id','pp-search-ecd','pp-search-nm'].includes(document.activeElement.id)) ppSearch();
+});
+
+renderCusts(custs);
+</script>
+</body>
+</html>

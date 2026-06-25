@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__mcp-registry__list_connectors",
+      "mcp__d8f78838-0459-43cc-9571-7ddb335d44f0__getAccessibleAtlassianResources",
+      "mcp__d8f78838-0459-43cc-9571-7ddb335d44f0__getConfluencePage",
+      "mcp__d8f78838-0459-43cc-9571-7ddb335d44f0__updateConfluencePage"
+    ]
+  }
+}
