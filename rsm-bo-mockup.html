@@ -176,7 +176,7 @@ input.ro{background:#F9FAFB;color:#6B7280;}
               <th>상품ID</th><th>상품ERP코드</th><th>상품명</th><th>과세여부</th><th>정가</th><th>판매가</th>
               <th>고객별고정가</th>
               <th>상호</th><th>회원코드</th>
-              <th>적용 시작일</th><th>적용 종료일</th>
+              <th>적용 시작일</th><th>최종 수정일</th>
             </tr></thead>
             <tbody id="pp-tbody"></tbody>
           </table>
@@ -281,7 +281,7 @@ input.ro{background:#F9FAFB;color:#6B7280;}
               <table class="dt" style="min-width:640px;">
                 <thead><tr>
                   <th>상품ID</th><th>상품ERP코드</th><th>상품명</th><th>과세여부</th>
-                  <th>정가</th><th>판매가</th><th>고객별고정가</th><th>등록일</th><th>수정일</th>
+                  <th>정가</th><th>판매가</th><th>고객별고정가</th><th>적용 시작일</th><th>최종 수정일</th>
                   <th style="text-align:center;">삭제</th>
                 </tr></thead>
                 <tbody id="prod-tbody"></tbody>
@@ -1036,7 +1036,7 @@ function ppRenderTable(editMode) {
     <td>${r.cnm}</td>
     <td>${r.mc}</td>
     <td>${r.sd}</td>
-    <td>${r.ed}</td>
+    <td>${r.md||'-'}</td>
   </tr>`).join('');
 }
 
