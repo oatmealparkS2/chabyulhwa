@@ -242,15 +242,15 @@ input.ro{background:#F9FAFB;color:#6B7280;}
                 <input type="text" id="pf-lp" class="ro fg-val" readonly placeholder="-">
               </div>
               <div class="fg-cell" style="background:#F9FAFB;"></div>
-              <div class="fg-cell" style="flex-direction:column;align-items:flex-start;gap:5px;">
-                <div style="display:flex;align-items:center;gap:10px;width:100%;">
+              <div id="pf-md-cell" class="fg-cell" style="flex-direction:column;align-items:flex-start;gap:5px;">
+                <div id="pf-md-row" style="display:flex;align-items:center;gap:10px;width:100%;">
                   <span class="fg-label">최대할인가</span>
                   <input type="text" id="pf-md-price" class="ro fg-val" readonly placeholder="-" style="color:#7B5CFA;font-weight:600;">
                 </div>
                 <div id="pf-md-subinfo" style="padding-left:122px;font-size:11px;color:#9CA3AF;display:flex;gap:14px;">
                   <span>판매가 <span id="pf-sp-sub" style="color:#374151;font-weight:500;">-</span></span>
-                  <span>AI기본쿠폰 <span id="pf-aibase-sub" style="color:#2563EB;font-weight:500;">-</span></span>
-                  <span>AI개인화쿠폰 <span id="pf-ai-sub" style="color:#2563EB;font-weight:500;">-</span></span>
+                  <span id="pf-aibase-wrap">AI기본쿠폰 <span id="pf-aibase-sub" style="color:#2563EB;font-weight:500;">-</span></span>
+                  <span id="pf-ai-wrap">AI개인화쿠폰 <span id="pf-ai-sub" style="color:#2563EB;font-weight:500;">-</span></span>
                 </div>
               </div>
               <div class="fg-cell">
@@ -347,7 +347,7 @@ input.ro{background:#F9FAFB;color:#6B7280;}
             <div style="font-size:11px;color:#9CA3AF;margin-bottom:8px;">가격 참고</div>
             <table class="price-tbl">
               <thead><tr>
-                <th>정가</th><th>판매가</th><th>AI기본쿠폰금액</th><th>AI개인화쿠폰금액</th><th>최대할인가</th>
+                <th>정가</th><th>판매가</th><th id="r-th-ai-base">AI기본쿠폰금액</th><th id="r-th-ai-val">AI개인화쿠폰금액</th><th id="r-th-md">최대할인가</th>
               </tr></thead>
               <tbody><tr>
                 <td id="r-lp">-</td>
@@ -721,11 +721,13 @@ function pfSetProduct(pid) {
   $('pf-nm').value        = cat.nm;
   $('pf-tax').value       = cat.tax;
   $('pf-lp').value        = f(cat.lp) + '원';
-  $('pf-md-price').value  = f(cat.md) + '원';
   $('pf-sp-sub').textContent      = f(cat.sp) + '원';
   const hasAi = cat.ai > 0;
-  $('pf-aibase-sub').textContent  = hasAi ? '-' : f(cat.aiBase) + '원';
-  $('pf-ai-sub').textContent      = hasAi ? f(cat.ai) + '원' : '-';
+  const isExisting = pfMode === 'edit';
+  // 기존 등록 상품: 최대할인가·AI쿠폰 값 미노출 (항목은 유지)
+  $('pf-md-price').value          = isExisting ? '' : f(cat.md) + '원';
+  $('pf-aibase-sub').textContent  = isExisting ? '-' : (hasAi ? '-' : f(cat.aiBase) + '원');
+  $('pf-ai-sub').textContent      = isExisting ? '-' : (hasAi ? f(cat.ai) + '원' : '-');
   if (pfMode === 'new') $('pf-fp').value = '';
   setTimeout(()=>$('pf-fp').focus(), 30);
 }
@@ -839,9 +841,11 @@ function peShowProductInfo(pid) {
   $('r-lp').textContent  = f(cat.lp)+'원';
   $('r-sp').textContent  = f(cat.sp)+'원';
   const hasAi = cat.ai > 0;
-  $('r-ai-base').textContent = hasAi ? '-' : f(cat.aiBase)+'원';
-  $('r-ai-val').textContent  = hasAi ? f(cat.ai)+'원' : '-';
-  $('r-md').textContent  = f(cat.md)+'원';
+  const isEditMode = !!editPid;
+  // 기존 등록 상품 수정 시: AI쿠폰금액·최대할인가 값 미노출 (항목은 유지)
+  $('r-ai-base').textContent = isEditMode ? '-' : (hasAi ? '-' : f(cat.aiBase)+'원');
+  $('r-ai-val').textContent  = isEditMode ? '-' : (hasAi ? f(cat.ai)+'원' : '-');
+  $('r-md').textContent      = isEditMode ? '-' : f(cat.md)+'원';
   $('ref-bar').style.display = 'block';
   $('p-fp').focus();
 }
