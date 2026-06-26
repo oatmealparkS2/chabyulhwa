@@ -173,7 +173,7 @@ input.ro{background:#F9FAFB;color:#6B7280;}
         <div class="tbl-wrap">
           <table class="dt" style="min-width:900px;">
             <thead><tr>
-              <th>상품ID</th><th>상품ERP코드</th><th>상품명</th><th>과세여부</th><th>정가</th>
+              <th>상품ID</th><th>상품ERP코드</th><th>상품명</th><th>과세여부</th><th>정가</th><th>판매가</th>
               <th>고객별고정가</th>
               <th>상호</th><th>회원코드</th>
               <th>적용 시작일</th><th>적용 종료일</th>
@@ -281,7 +281,7 @@ input.ro{background:#F9FAFB;color:#6B7280;}
               <table class="dt" style="min-width:640px;">
                 <thead><tr>
                   <th>상품ID</th><th>상품ERP코드</th><th>상품명</th><th>과세여부</th>
-                  <th>정가</th><th>고객별고정가</th><th>등록일</th><th>수정일</th>
+                  <th>정가</th><th>판매가</th><th>고객별고정가</th><th>등록일</th><th>수정일</th>
                   <th style="text-align:center;">삭제</th>
                 </tr></thead>
                 <tbody id="prod-tbody"></tbody>
@@ -440,21 +440,21 @@ let custs = [
 
 let prods = {
   1:[
-    {pid:'5106703',ecd:'ERP-A001',nm:'국내산 흙대파 특 10kg/PK',tax:'과세',lp:29340,fp:20500,rd:'2026-06-01',md:'2026-06-01'},
-    {pid:'5106171',ecd:'ERP-A002',nm:'국내산 햇양파 1번구 특 15kg/EA',tax:'과세',lp:15780,fp:11270,rd:'2026-06-01',md:'2026-06-15'},
-    {pid:'5114687',ecd:'ERP-A003',nm:'[3개묶음]국내산 햇양파 특 15kg/EA',tax:'면세',lp:15780,fp:10800,rd:'2026-06-01',md:'2026-06-01'},
-    {pid:'5106694',ecd:'ERP-A004',nm:'국내산 양파 2번구 15kg/EA',tax:'면세',lp:15780,fp:11030,rd:'2026-06-01',md:'2026-06-01'},
+    {pid:'5106703',ecd:'ERP-A001',nm:'국내산 흙대파 특 10kg/PK',tax:'과세',lp:29340,sp:20500,fp:20500,rd:'2026-06-01',md:'2026-06-01'},
+    {pid:'5106171',ecd:'ERP-A002',nm:'국내산 햇양파 1번구 특 15kg/EA',tax:'과세',lp:15780,sp:11270,fp:11270,rd:'2026-06-01',md:'2026-06-15'},
+    {pid:'5114687',ecd:'ERP-A003',nm:'[3개묶음]국내산 햇양파 특 15kg/EA',tax:'면세',lp:15780,sp:10800,fp:10800,rd:'2026-06-01',md:'2026-06-01'},
+    {pid:'5106694',ecd:'ERP-A004',nm:'국내산 양파 2번구 15kg/EA',tax:'면세',lp:15780,sp:11030,fp:11030,rd:'2026-06-01',md:'2026-06-01'},
   ],
   2:[
-    {pid:'5115566',ecd:'ERP-B001',nm:'국내산 와일드 루꼴라 1kg/PK',tax:'면세',lp:33200,fp:23200,rd:'2026-06-20',md:'2026-06-20'},
-    {pid:'1100381',ecd:'ERP-B002',nm:'국내산 와일드 루꼴라 500g/PK',tax:'면세',lp:18260,fp:12760,rd:'2026-06-20',md:'2026-06-20'},
-    {pid:'5107001',ecd:'ERP-D001',nm:'국내산 브로콜리 특 500gx5/box',tax:'면세',lp:12500,fp:7500,rd:'2026-06-20',md:'2026-06-20'},
-    {pid:'5107002',ecd:'ERP-D002',nm:'국내산 미니파프리카 혼합 1kg/PK',tax:'과세',lp:9800,fp:6000,rd:'2026-06-20',md:'2026-06-20'},
+    {pid:'5115566',ecd:'ERP-B001',nm:'국내산 와일드 루꼴라 1kg/PK',tax:'면세',lp:33200,sp:23200,fp:23200,rd:'2026-06-20',md:'2026-06-20'},
+    {pid:'1100381',ecd:'ERP-B002',nm:'국내산 와일드 루꼴라 500g/PK',tax:'면세',lp:18260,sp:12760,fp:12760,rd:'2026-06-20',md:'2026-06-20'},
+    {pid:'5107001',ecd:'ERP-D001',nm:'국내산 브로콜리 특 500gx5/box',tax:'면세',lp:12500,sp:8800,fp:7500,rd:'2026-06-20',md:'2026-06-20'},
+    {pid:'5107002',ecd:'ERP-D002',nm:'국내산 미니파프리카 혼합 1kg/PK',tax:'과세',lp:9800,sp:6900,fp:6000,rd:'2026-06-20',md:'2026-06-20'},
   ],
   3:[
-    {pid:'5106308',ecd:'ERP-C001',nm:'국내산 양상추(개별포장) 500g/EA',tax:'과세',lp:3220,fp:2250,rd:'2025-05-15',md:'2025-05-15'},
-    {pid:'5112284',ecd:'ERP-C002',nm:'국내산 양상추 벌크 1eax12/box',tax:'과세',lp:29580,fp:20680,rd:'2025-05-15',md:'2025-05-15'},
-    {pid:'5106576',ecd:'ERP-C003',nm:'국내산 부추 특 500gx2/PK',tax:'면세',lp:3540,fp:2470,rd:'2025-05-15',md:'2025-05-15'},
+    {pid:'5106308',ecd:'ERP-C001',nm:'국내산 양상추(개별포장) 500g/EA',tax:'과세',lp:3220,sp:2250,fp:2250,rd:'2025-05-15',md:'2025-05-15'},
+    {pid:'5112284',ecd:'ERP-C002',nm:'국내산 양상추 벌크 1eax12/box',tax:'과세',lp:29580,sp:20680,fp:20680,rd:'2025-05-15',md:'2025-05-15'},
+    {pid:'5106576',ecd:'ERP-C003',nm:'국내산 부추 특 500gx2/PK',tax:'면세',lp:3540,sp:2470,fp:2470,rd:'2025-05-15',md:'2025-05-15'},
   ],
 };
 
@@ -768,7 +768,7 @@ function pfSave() {
   } else {
     if (list.some(p=>p.pid===pfSelectedPid)) { toast('이미 등록된 상품입니다.', 'err'); return; }
     const cat = catalog[pfSelectedPid];
-    list.push({pid:pfSelectedPid,ecd:cat.ecd,nm:cat.nm,tax:cat.tax,lp:cat.lp,fp,rd:td(),md:td()});
+    list.push({pid:pfSelectedPid,ecd:cat.ecd,nm:cat.nm,tax:cat.tax,lp:cat.lp,sp:cat.sp,fp,rd:td(),md:td()});
     toast('상품이 등록되었습니다.');
   }
   pfClear();
@@ -872,7 +872,7 @@ function saveProd() {
     toast('고객별고정가가 수정되었습니다.');
   } else {
     if (list.some(p=>p.pid===pid)) { toast('이미 해당 고객에 동일 상품이 등록되어 있습니다.', 'err'); return; }
-    list.push({pid,ecd:cat.ecd,nm:cat.nm,tax:cat.tax,lp:cat.lp,fp:Number(fpv),rd:td(),md:td()});
+    list.push({pid,ecd:cat.ecd,nm:cat.nm,tax:cat.tax,lp:cat.lp,sp:cat.sp,fp:Number(fpv),rd:td(),md:td()});
     toast('상품이 등록되었습니다.');
   }
   goDetailFromEdit();
@@ -929,13 +929,14 @@ function renderProds(editMode=false) {
   const list = prods[curCid]||[];
   $('prod-cnt').textContent = list.length;
   const tb = $('prod-tbody');
-  if (!list.length) { tb.innerHTML='<tr><td colspan="9" class="empty">등록된 상품이 없습니다. 위 폼에서 상품을 검색하여 추가하세요.</td></tr>'; return; }
+  if (!list.length) { tb.innerHTML='<tr><td colspan="10" class="empty">등록된 상품이 없습니다. 위 폼에서 상품을 검색하여 추가하세요.</td></tr>'; return; }
   tb.innerHTML = list.map(p=>`<tr data-pid="${p.pid}" ${editMode ? '' : `onclick="pfEditProd('${p.pid}')" style="cursor:pointer;"`}>
     <td>${p.pid}</td>
     <td>${p.ecd}</td>
     <td style="max-width:190px;overflow:hidden;text-overflow:ellipsis;">${p.nm}</td>
     <td><span class="bx ${p.tax==='과세'?'tax':'free'}">${p.tax}</span></td>
     <td>${f(p.lp)}</td>
+    <td>${f(p.sp ?? catalog[p.pid]?.sp)}</td>
     <td>${editMode
       ? `<input type="number" class="d-fp-input" data-pid="${p.pid}" value="${p.fp}" style="width:108px;height:26px;font-size:12px;">`
       : `<span class="hp">${f(p.fp)}</span>`}</td>
@@ -977,6 +978,7 @@ function ppBuildRows() {
     (prods[c.id]||[]).forEach(p => {
       rows.push({
         pid: p.pid, ecd: p.ecd, nm: p.nm, tax: p.tax, lp: p.lp,
+        sp: p.sp ?? catalog[p.pid]?.sp,
         cid: c.id, cnm: c.nm, mc: c.mc, sd: c.sd, ed: c.ed,
         fp: p.fp, rd: p.rd, md: p.md
       });
@@ -1018,7 +1020,7 @@ function ppRenderTable(editMode) {
   $('pp-cnt').textContent = rows.length;
   const tb = $('pp-tbody');
   if (!rows.length) {
-    tb.innerHTML = '<tr><td colspan="11" class="empty">검색 결과가 없습니다</td></tr>';
+    tb.innerHTML = '<tr><td colspan="12" class="empty">검색 결과가 없습니다</td></tr>';
     return;
   }
   tb.innerHTML = rows.map((r, i) => `<tr data-idx="${i}">
@@ -1027,6 +1029,7 @@ function ppRenderTable(editMode) {
     <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${r.nm}</td>
     <td><span class="bx ${r.tax==='과세'?'tax':'free'}">${r.tax}</span></td>
     <td>${f(r.lp)}</td>
+    <td>${f(r.sp)}</td>
     <td>${editMode
       ? `<input type="number" class="pp-fp-input" data-idx="${i}" value="${r.fp}" style="width:108px;height:26px;font-size:12px;">`
       : `<span class="hp">${f(r.fp)}</span>`}</td>
