@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>고객별 가격관리 — BO 화면 프로토타입</title>
+<title>가격 관리 — BO 화면 프로토타입</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -30,9 +30,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .btn-back{background:none;border:1px solid #E5E7EB;cursor:pointer;color:#6B7280;font-size:12px;display:flex;align-items:center;gap:3px;padding:4px 10px;border-radius:6px;}
 .btn-back:hover{background:#F9FAFB;color:#374151;}
 .toolbar{display:flex;gap:7px;padding:10px 18px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;flex-wrap:wrap;align-items:center;}
-input[type=text],input[type=date],input[type=number]{background:#fff;border:1px solid #D1D5DB;border-radius:6px;padding:4px 9px;font-size:12px;color:#111827;height:30px;font-family:inherit;}
-input:focus{outline:none;border-color:#7B5CFA;box-shadow:0 0 0 3px #7B5CFA18;}
-input.ro{background:#F9FAFB;color:#6B7280;}
+input[type=text],input[type=date],input[type=number],select,textarea{background:#fff;border:1px solid #D1D5DB;border-radius:6px;padding:4px 9px;font-size:12px;color:#111827;font-family:inherit;}
+input[type=text],input[type=date],input[type=number],select{height:30px;}
+textarea{resize:vertical;min-height:52px;line-height:1.4;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#7B5CFA;box-shadow:0 0 0 3px #7B5CFA18;}
+input.ro,textarea.ro{background:#F9FAFB;color:#6B7280;}
 .btn{cursor:pointer;border-radius:6px;font-size:12px;height:30px;padding:0 13px;font-family:inherit;border:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font-weight:500;}
 .bp{background:#7B5CFA;color:#fff;}.bp:hover{background:#6B4DEA;}
 .bo{background:#fff;border:1px solid #D1D5DB;color:#374151;}.bo:hover{background:#F9FAFB;}
@@ -91,12 +93,15 @@ input.ro{background:#F9FAFB;color:#6B7280;}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #E5E7EB;}
 .fg-cell{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid #F3F4F6;}
 .fg-cell:nth-child(odd){border-right:1px solid #F3F4F6;}
+.fg-cell.full{grid-column:1/-1;border-right:none;}
 .fg-label{font-size:12px;color:#6B7280;width:112px;flex-shrink:0;}
 .fg-val{flex:1;}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;}
-.modal{background:#fff;border-radius:10px;width:660px;max-height:78vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.2);}
+.modal{background:#fff;border-radius:10px;width:820px;max-height:78vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.2);}
 .modal-hd{padding:13px 18px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;flex-shrink:0;}
 .modal-body{flex:1;overflow-y:auto;}
+.tag-on{background:#D1FAE5;color:#065F46;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:500;}
+.tag-stop{background:#FEE2E2;color:#991B1B;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:500;}
 </style>
 </head>
 <body>
@@ -105,21 +110,26 @@ input.ro{background:#F9FAFB;color:#6B7280;}
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-logo">차별화상회 BO</div>
-    <div class="sidebar-item active"><i class="ti ti-tag"></i> 고객별 고정가 관리</div>
+    <div class="sidebar-item"><i class="ti ti-home"></i> 홈</div>
+    <div class="sidebar-item"><i class="ti ti-users"></i> 회원 관리</div>
+    <div class="sidebar-item active"><i class="ti ti-tag"></i> 가격 관리</div>
+    <div class="sidebar-item"><i class="ti ti-clipboard-list"></i> 주문 관리</div>
+    <div class="sidebar-item"><i class="ti ti-chart-bar"></i> 통계</div>
+    <div class="sidebar-item"><i class="ti ti-settings"></i> 설정</div>
   </div>
 
   <div class="main">
     <!-- Top bar -->
     <div class="topbar">
-      <span class="topbar-title">고객별 고정가 관리</span>
+      <span class="topbar-title">가격 관리</span>
       <span class="topbar-sep">/</span>
-      <span class="topbar-cur" id="topbar-label">고객별 가격관리</span>
+      <span class="topbar-cur" id="topbar-label">고객별 고정가 관리</span>
     </div>
 
     <!-- Tab bar -->
     <div class="tab-bar" id="tab-bar">
       <div class="tab-item active" id="tab-fixed" onclick="switchTab('fixed')">
-        <i class="ti ti-users"></i> 고객별 가격관리
+        <i class="ti ti-users"></i> 고객별 고정가 관리
       </div>
       <div class="tab-item" id="tab-product" onclick="switchTab('product')">
         <i class="ti ti-tag"></i> 상품별 가격관리
@@ -133,17 +143,17 @@ input.ro{background:#F9FAFB;color:#6B7280;}
         <div class="page-hd">고객별고정가 관리</div>
         <div class="toolbar">
           <input type="text" id="s-name" placeholder="상호명" style="width:110px;">
-          <input type="text" id="s-code" placeholder="회원코드" style="width:130px;">
+          <input type="text" id="s-code" placeholder="회원번호" style="width:130px;">
           <button class="btn bp" onclick="doSearch()"><i class="ti ti-search"></i> 검색</button>
           <button class="btn bp" style="margin-left:auto;" onclick="goNewCust()"><i class="ti ti-plus"></i> 고객 추가</button>
           <button class="btn bo" onclick="alert('준비 중입니다.')"><i class="ti ti-download"></i> 엑셀다운로드</button>
           <button class="btn bd" onclick="alert('준비 중입니다.')"><i class="ti ti-upload"></i> 일괄업로드</button>
         </div>
-        <div class="total-row">Total : <span class="tc" id="list-cnt">3</span></div>
+        <div class="total-row">Total : <span class="tc" id="list-cnt">0</span></div>
         <table class="dt">
           <thead><tr>
-            <th>상호명</th><th>회원코드</th>
-            <th>적용 시작일</th><th>적용 종료일</th>
+            <th>상호명</th><th>회원번호</th>
+            <th>적용기간 시작일</th><th>적용기간 종료일</th>
             <th>등록상품수</th><th>등록일</th><th></th>
           </tr></thead>
           <tbody id="cust-tbody"></tbody>
@@ -171,11 +181,13 @@ input.ro{background:#F9FAFB;color:#6B7280;}
         <div class="total-row">Total : <span class="tc" id="pp-cnt">0</span></div>
 
         <div class="tbl-wrap">
-          <table class="dt" style="min-width:900px;">
+          <table class="dt" style="min-width:1200px;">
             <thead><tr>
-              <th>상품ID</th><th>상품ERP코드</th><th>상품명</th><th>과세여부</th><th>정가</th><th>판매가</th>
+              <th>상품ERP코드</th><th>상품ID</th><th>상품명</th>
+              <th>과세여부</th><th>정가</th><th>판매가</th>
               <th>고객별고정가</th>
-              <th>상호</th><th>회원코드</th>
+              <th>기타</th>
+              <th>상호</th><th>회원번호</th>
               <th>적용 시작일</th><th>최종 수정일</th>
             </tr></thead>
             <tbody id="pp-tbody"></tbody>
@@ -190,24 +202,28 @@ input.ro{background:#F9FAFB;color:#6B7280;}
           <span id="detail-hd-label">고객별고정가 상세</span>
         </div>
 
-        <div class="fr">
-          <span class="fl">상호명</span>
-          <input type="text" id="d-name"  style="width:185px;" class="ro" readonly oninput="custAutoFill(this); checkCustReady()">
-          <span class="fl" style="margin-left:20px;">회원코드</span>
-          <input type="text" id="d-mcode" style="width:135px;" class="ro" readonly oninput="custAutoFill(this); checkCustReady()">
+        <!-- 기존 고객: 읽기전용 / 신규 고객: 입력폼 -->
+        <div id="d-view-ro" class="ro-band" style="padding:12px 18px;border-bottom:1px solid #E5E7EB;flex-wrap:wrap;gap:0;">
+          <div class="ro-item"><span class="ro-lbl">상호명</span><span class="ro-val" id="d-ro-name">-</span></div>
+          <div class="ro-item"><span class="ro-lbl">회원번호</span><span class="ro-val" id="d-ro-mcode">-</span></div>
+          <div class="ro-item"><span class="ro-lbl">적용기간</span><span class="ro-val" id="d-ro-period">-</span></div>
         </div>
-        <div class="fr">
-          <span class="fl">적용 시작일</span>
-          <input type="date" id="d-start" style="width:143px;" class="ro" readonly>
-          <span class="fl" style="margin-left:20px;">적용 종료일</span>
-          <input type="date" id="d-end" style="width:143px;" class="ro" readonly>
-        </div>
-        <div class="callout">
-          <i class="ti ti-info-circle"></i>
-          적용기간은 <strong>고객 단위</strong>로 설정되며, 등록된 모든 상품에 동일하게 적용됩니다.
-        </div>
-        <div id="cust-save-bar" class="save-bar" style="display:none;">
-          <button class="btn bp" id="d-save-cust-btn" onclick="saveCust()" disabled style="opacity:0.4;cursor:not-allowed;">등록하기</button>
+        <div id="d-view-form" style="display:none;">
+          <div class="fr">
+            <span class="fl">상호명</span>
+            <input type="text" id="d-name"  style="width:185px;">
+            <span class="fl" style="margin-left:20px;">회원번호</span>
+            <input type="text" id="d-mcode" style="width:135px;">
+          </div>
+          <div class="fr">
+            <span class="fl">적용기간 시작일</span>
+            <input type="date" id="d-start" style="width:143px;">
+            <span class="fl" style="margin-left:20px;">적용기간 종료일</span>
+            <input type="date" id="d-end" style="width:143px;">
+          </div>
+          <div class="save-bar">
+            <button class="btn bp" id="d-save-cust-btn" onclick="saveCust()">등록하기</button>
+          </div>
         </div>
 
         <div id="prod-section">
@@ -219,15 +235,11 @@ input.ro{background:#F9FAFB;color:#6B7280;}
             </div>
             <div class="form-grid">
               <div class="fg-cell">
-                <span class="fg-label">상품ID</span>
+                <span class="fg-label">상품ID / ERP코드</span>
                 <div style="display:flex;gap:5px;flex:1;">
-                  <input type="text" id="pf-q" placeholder="상품ID 입력 후 Enter" class="fg-val" onkeydown="if(event.key==='Enter')pfQuickLookup()">
+                  <input type="text" id="pf-q" placeholder="ID 또는 ERP코드 입력 후 Enter" class="fg-val" onkeydown="if(event.key==='Enter')pfQuickLookup()">
                   <button class="btn bo" style="height:30px;padding:0 9px;flex-shrink:0;" onclick="openProductSearchModal()" title="검색으로 찾기"><i class="ti ti-search"></i></button>
                 </div>
-              </div>
-              <div class="fg-cell">
-                <span class="fg-label">상품ERP코드</span>
-                <input type="text" id="pf-ecd" class="ro fg-val" readonly placeholder="-">
               </div>
               <div class="fg-cell">
                 <span class="fg-label">상품명</span>
@@ -241,21 +253,29 @@ input.ro{background:#F9FAFB;color:#6B7280;}
                 <span class="fg-label">정가</span>
                 <input type="text" id="pf-lp" class="ro fg-val" readonly placeholder="-">
               </div>
-              <div class="fg-cell" style="background:#F9FAFB;"></div>
-              <div id="pf-md-cell" class="fg-cell" style="flex-direction:column;align-items:flex-start;gap:5px;">
-                <div id="pf-md-row" style="display:flex;align-items:center;gap:10px;width:100%;">
-                  <span class="fg-label">최대할인가</span>
-                  <input type="text" id="pf-md-price" class="ro fg-val" readonly placeholder="-" style="color:#7B5CFA;font-weight:600;">
-                </div>
-                <div id="pf-md-subinfo" style="padding-left:122px;font-size:11px;color:#9CA3AF;display:flex;gap:14px;">
-                  <span>판매가 <span id="pf-sp-sub" style="color:#374151;font-weight:500;">-</span></span>
-                  <span id="pf-aibase-wrap">AI기본쿠폰 <span id="pf-aibase-sub" style="color:#2563EB;font-weight:500;">-</span></span>
-                  <span id="pf-ai-wrap">AI개인화쿠폰 <span id="pf-ai-sub" style="color:#2563EB;font-weight:500;">-</span></span>
-                </div>
+              <div class="fg-cell">
+                <span class="fg-label">판매가</span>
+                <input type="text" id="pf-sp" class="ro fg-val" readonly placeholder="-">
+              </div>
+              <div class="fg-cell">
+                <span class="fg-label">AI기본쿠폰금액</span>
+                <input type="text" id="pf-ai-base" class="ro fg-val" readonly placeholder="-" style="color:#2563EB;">
+              </div>
+              <div class="fg-cell">
+                <span class="fg-label">AI개인화쿠폰금액</span>
+                <input type="text" id="pf-ai" class="ro fg-val" readonly placeholder="-" style="color:#2563EB;">
+              </div>
+              <div class="fg-cell">
+                <span class="fg-label">최종할인가</span>
+                <input type="text" id="pf-md-price" class="ro fg-val" readonly placeholder="-" style="color:#7B5CFA;font-weight:600;">
               </div>
               <div class="fg-cell">
                 <span class="fg-label">고객별고정가 <span style="color:#E24B4A;">*</span></span>
                 <input type="number" id="pf-fp" placeholder="금액 입력" class="fg-val">
+              </div>
+              <div class="fg-cell full">
+                <span class="fg-label">기타</span>
+                <textarea id="pf-remarks" class="fg-val" placeholder="협의사항, 특이사항 등 (선택)"></textarea>
               </div>
             </div>
             <div style="padding:10px 18px;display:flex;gap:8px;border-top:1px solid #E5E7EB;">
@@ -278,10 +298,11 @@ input.ro{background:#F9FAFB;color:#6B7280;}
             </div>
             <div class="total-row">Total : <span class="tc" id="prod-cnt">0</span></div>
             <div class="tbl-wrap">
-              <table class="dt" style="min-width:640px;">
+              <table class="dt" style="min-width:900px;">
                 <thead><tr>
-                  <th>상품ID</th><th>상품ERP코드</th><th>상품명</th><th>과세여부</th>
-                  <th>정가</th><th>판매가</th><th>고객별고정가</th><th>적용 시작일</th><th>최종 수정일</th>
+                  <th>상품ERP코드</th><th>상품ID</th><th>상품명</th><th>과세여부</th>
+                  <th>정가</th><th>판매가</th><th>고객별고정가</th><th>기타</th>
+                  <th>적용 시작일</th><th>최종 수정일</th>
                   <th style="text-align:center;">삭제</th>
                 </tr></thead>
                 <tbody id="prod-tbody"></tbody>
@@ -301,7 +322,7 @@ input.ro{background:#F9FAFB;color:#6B7280;}
         <!-- 대상 고객 (read-only) -->
         <div class="ro-band" style="background:#F9FAFB;border-bottom:1px solid #E5E7EB;">
           <div class="ro-item"><span class="ro-lbl">상호명</span><span class="ro-val" id="pe-cnm">-</span></div>
-          <div class="ro-item"><span class="ro-lbl">회원코드</span><span class="ro-val" id="pe-mc">-</span></div>
+          <div class="ro-item"><span class="ro-lbl">회원번호</span><span class="ro-val" id="pe-mc">-</span></div>
           <div class="ro-item"><span class="ro-lbl">적용기간</span><span class="ro-val" id="pe-period">-</span></div>
         </div>
 
@@ -347,7 +368,7 @@ input.ro{background:#F9FAFB;color:#6B7280;}
             <div style="font-size:11px;color:#9CA3AF;margin-bottom:8px;">가격 참고</div>
             <table class="price-tbl">
               <thead><tr>
-                <th>정가</th><th>판매가</th><th id="r-th-ai-base">AI기본쿠폰금액</th><th id="r-th-ai-val">AI개인화쿠폰금액</th><th id="r-th-md">최대할인가</th>
+                <th>정가</th><th>판매가</th><th>AI기본쿠폰금액</th><th>AI개인화쿠폰금액</th><th>최대할인가</th>
               </tr></thead>
               <tbody><tr>
                 <td id="r-lp">-</td>
@@ -377,7 +398,7 @@ input.ro{background:#F9FAFB;color:#6B7280;}
   </div><!-- /main -->
 </div><!-- /layout -->
 
-<!-- 상품 검색 모달 -->
+<!-- 상품 검색 모달 (기존 캠페인 내 상품검색 팝업 활용 — 공통 UI) -->
 <div id="modal-product-search" class="modal-bg" style="display:none;" onclick="if(event.target===this)closeProductModal()">
   <div class="modal">
     <div class="modal-hd">
@@ -385,22 +406,39 @@ input.ro{background:#F9FAFB;color:#6B7280;}
       <button class="ico-btn ico-del" style="font-size:18px;" onclick="closeProductModal()"><i class="ti ti-x"></i></button>
     </div>
     <div class="modal-body">
-      <div class="toolbar">
+      <div class="toolbar" style="flex-wrap:wrap;gap:6px;">
+        <select id="m-q-type" style="width:120px;">
+          <option value="">상품타입 전체</option>
+          <option value="농수축산품">농수축산품</option>
+          <option value="집화">집화</option>
+          <option value="가공식품">가공식품</option>
+        </select>
+        <select id="m-q-scale" style="width:110px;">
+          <option value="">계근여부 전체</option>
+          <option value="규격">규격</option>
+          <option value="비규격(계근)">비규격(계근)</option>
+        </select>
         <input type="text" id="m-q-id"  placeholder="상품ID"      style="width:100px;">
-        <input type="text" id="m-q-ecd" placeholder="상품ERP코드" style="width:128px;">
+        <input type="text" id="m-q-ecd" placeholder="erp code" style="width:110px;">
         <input type="text" id="m-q-nm"  placeholder="상품명"       style="width:185px;">
         <button class="btn bp" onclick="mSearch()"><i class="ti ti-search"></i> 검색</button>
         <button class="btn bo" onclick="mClear()">초기화</button>
       </div>
       <div id="m-results" style="display:none;">
         <div style="padding:6px 18px;font-size:12px;color:#6B7280;border-bottom:1px solid #E5E7EB;background:#F9FAFB;">
-          검색결과 <span class="tc" id="m-cnt">0</span>건 — 상품을 클릭해 선택하세요
+          Total : <span class="tc" id="m-cnt">0</span>건 — 상품을 클릭해 선택하세요
         </div>
         <div class="tbl-wrap">
-          <table class="dt" style="min-width:500px;">
-            <thead><tr><th>상품ID</th><th>상품ERP코드</th><th>상품명</th><th>과세여부</th><th>정가</th></tr></thead>
+          <table class="dt" style="min-width:700px;">
+            <thead><tr>
+              <th>id</th><th>erp_code</th><th>상품타입</th><th>배송방법</th>
+              <th>계근여부</th><th>상품명</th><th>상태</th><th>정가</th>
+            </tr></thead>
             <tbody id="m-tbody"></tbody>
           </table>
+        </div>
+        <div style="padding:8px 18px;border-top:1px solid #E5E7EB;text-align:right;">
+          <button class="btn bo" style="font-size:12px;" onclick="closeProductModal()">닫기</button>
         </div>
       </div>
     </div>
@@ -416,45 +454,97 @@ const td = () => new Date().toISOString().slice(0,10);
 const $ = id => document.getElementById(id);
 
 const catalog = {
-  '5106703':{ecd:'ERP-A001',nm:'국내산 흙대파 특 10kg/PK',      tax:'과세',lp:29340,sp:20500,aiBase:2000,ai:1500,md:19000},
-  '5106171':{ecd:'ERP-A002',nm:'국내산 햇양파 1번구 특 15kg/EA', tax:'과세',lp:15780,sp:11270,aiBase:1200,ai:800, md:10470},
-  '5114687':{ecd:'ERP-A003',nm:'[3개묶음]국내산 햇양파 특 15kg/EA',tax:'면세',lp:15780,sp:10800,aiBase:1000,ai:700, md:10100},
-  '5106694':{ecd:'ERP-A004',nm:'국내산 양파 2번구 15kg/EA',      tax:'면세',lp:15780,sp:11030,aiBase:1100,ai:900, md:10130},
-  '5115566':{ecd:'ERP-B001',nm:'국내산 와일드 루꼴라 1kg/PK',   tax:'면세',lp:33200,sp:23200,aiBase:2500,ai:2000,md:21200},
-  '1100381':{ecd:'ERP-B002',nm:'국내산 와일드 루꼴라 500g/PK',  tax:'면세',lp:18260,sp:12760,aiBase:1300,ai:1000,md:11760},
-  '5106308':{ecd:'ERP-C001',nm:'국내산 양상추(개별포장) 500g/EA',tax:'과세',lp:3220, sp:2250, aiBase:300, ai:200, md:2050},
-  '5112284':{ecd:'ERP-C002',nm:'국내산 양상추 벌크 1eax12/box', tax:'과세',lp:29580,sp:20680,aiBase:2100,ai:1800,md:18880},
-  '5106576':{ecd:'ERP-C003',nm:'국내산 부추 특 500gx2/PK',      tax:'면세',lp:3540, sp:2470, aiBase:400, ai:300, md:2170},
-  '5106563':{ecd:'ERP-A005',nm:'국내산 청경채 특 4kg/box',       tax:'과세',lp:6230, sp:4350, aiBase:500, ai:400, md:3950},
-  '5107001':{ecd:'ERP-D001',nm:'국내산 브로콜리 특 500gx5/box', tax:'면세',lp:12500,sp:8800, aiBase:900, ai:0,   md:7900},
-  '5107002':{ecd:'ERP-D002',nm:'국내산 미니파프리카 혼합 1kg/PK',tax:'과세',lp:9800, sp:6900, aiBase:700, ai:0,   md:6200},
+  '5106703':{ecd:'ERP-A001',nm:'국내산 흙대파 특 10kg/PK',           tax:'과세',lp:29340,sp:20500,aiBase:2000,ai:1500,md:19000, type:'농수축산품',delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5106171':{ecd:'ERP-A002',nm:'국내산 햇양파 1번구 특 15kg/EA',     tax:'과세',lp:15780,sp:11270,aiBase:1200,ai:800, md:10470, type:'농수축산품',delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5114687':{ecd:'ERP-A003',nm:'[3개묶음]국내산 햇양파 특 15kg/EA',  tax:'면세',lp:15780,sp:10800,aiBase:1000,ai:700, md:10100, type:'농수축산품',delivery:'택배',scale:'비규격(계근)',status:'판매가능'},
+  '5106694':{ecd:'ERP-A004',nm:'국내산 양파 2번구 15kg/EA',           tax:'면세',lp:15780,sp:11030,aiBase:1100,ai:900, md:10130, type:'농수축산품',delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5115566':{ecd:'ERP-B001',nm:'국내산 와일드 루꼴라 1kg/PK',        tax:'면세',lp:33200,sp:23200,aiBase:2500,ai:2000,md:21200, type:'집화',       delivery:'택배',scale:'규격',        status:'판매가능'},
+  '1100381':{ecd:'ERP-B002',nm:'국내산 와일드 루꼴라 500g/PK',       tax:'면세',lp:18260,sp:12760,aiBase:1300,ai:1000,md:11760, type:'집화',       delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5106308':{ecd:'ERP-C001',nm:'국내산 양상추(개별포장) 500g/EA',    tax:'과세',lp:3220, sp:2250, aiBase:300, ai:200, md:2050,  type:'집화',       delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5112284':{ecd:'ERP-C002',nm:'국내산 양상추 벌크 1eax12/box',      tax:'과세',lp:29580,sp:20680,aiBase:2100,ai:1800,md:18880, type:'가공식품',   delivery:'택배',scale:'비규격(계근)',status:'판매중지'},
+  '5106576':{ecd:'ERP-C003',nm:'국내산 부추 특 500gx2/PK',           tax:'면세',lp:3540, sp:2470, aiBase:400, ai:300, md:2170,  type:'집화',       delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5106563':{ecd:'ERP-A005',nm:'국내산 청경채 특 4kg/box',            tax:'과세',lp:6230, sp:4350, aiBase:500, ai:400, md:3950,  type:'농수축산품',delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5108821':{ecd:'ERP-D001',nm:'국내산 시금치 특 300g/PK',            tax:'면세',lp:2980, sp:2080, aiBase:200, ai:150, md:1880,  type:'집화',       delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5109042':{ecd:'ERP-D002',nm:'국내산 깻잎 특 100g/PK',              tax:'면세',lp:1290, sp:900,  aiBase:100, ai:80,  md:820,   type:'집화',       delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5109211':{ecd:'ERP-D003',nm:'국내산 깐마늘 특 1kg/PK',             tax:'면세',lp:7850, sp:5480, aiBase:600, ai:500, md:4980,  type:'농수축산품',delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5110334':{ecd:'ERP-E001',nm:'국내산 당근 특 10kg/PK',              tax:'면세',lp:11200,sp:7840, aiBase:800, ai:600, md:7240,  type:'농수축산품',delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5110892':{ecd:'ERP-E002',nm:'국내산 무 특 20kg/EA',                tax:'면세',lp:18500,sp:12950,aiBase:1300,ai:1000,md:11950, type:'농수축산품',delivery:'택배',scale:'비규격(계근)',status:'판매가능'},
+  '5111504':{ecd:'ERP-F001',nm:'국내산 감자 특 10kg/PK',              tax:'면세',lp:16400,sp:11480,aiBase:1200,ai:900, md:10580, type:'농수축산품',delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5112018':{ecd:'ERP-F002',nm:'국내산 고구마 특 5kg/PK',             tax:'면세',lp:13200,sp:9240, aiBase:900, ai:700, md:8540,  type:'농수축산품',delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5113201':{ecd:'ERP-G001',nm:'국내산 브로콜리 특 3kg/PK',           tax:'과세',lp:8750, sp:6120, aiBase:600, ai:500, md:5620,  type:'집화',       delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5113847':{ecd:'ERP-G002',nm:'국내산 콜리플라워 특 3kg/PK',         tax:'과세',lp:9200, sp:6440, aiBase:700, ai:550, md:5890,  type:'집화',       delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5114320':{ecd:'ERP-H001',nm:'국내산 적상추 500g/PK',               tax:'면세',lp:2460, sp:1720, aiBase:150, ai:120, md:1600,  type:'집화',       delivery:'택배',scale:'규격',        status:'판매가능'},
+  '5115102':{ecd:'ERP-H002',nm:'국내산 청경채 특 1kg/PK',             tax:'면세',lp:3180, sp:2220, aiBase:250, ai:200, md:2020,  type:'집화',       delivery:'택배',scale:'규격',        status:'판매가능'},
 };
 // ERP코드 → pid 역색인
 const catalogByEcd = Object.fromEntries(Object.entries(catalog).map(([pid,c])=>[c.ecd, {pid,...c}]));
 
 let custs = [
-  {id:1,nm:'㈜맛있는부엌',mc:'user_2041',ec:'ERP-00231',sd:'2026-06-01',ed:'2026-12-31',rd:'2026-05-28'},
-  {id:2,nm:'더키친푸드㈜',mc:'user_3872',ec:'ERP-00198',sd:'2026-07-01',ed:'2026-12-31',rd:'2026-06-20'},
-  {id:3,nm:'프레시팜㈜',mc:'user_1190',ec:'ERP-00115',sd:'2025-06-01',ed:'2026-05-31',rd:'2025-05-15'},
+  {id:1, nm:'㈜맛있는부엌',  mc:'user_2041', ec:'ERP-00231', sd:'2026-06-01', ed:'2026-12-31', rd:'2026-05-28'},
+  {id:2, nm:'더키친푸드㈜',  mc:'user_3872', ec:'ERP-00198', sd:'2026-07-01', ed:'2026-12-31', rd:'2026-06-20'},
+  {id:3, nm:'프레시팜㈜',    mc:'user_1190', ec:'ERP-00115', sd:'2025-06-01', ed:'2026-05-31', rd:'2025-05-15'},
+  {id:4, nm:'한식당그룹㈜',  mc:'user_4521', ec:'ERP-00312', sd:'2026-05-01', ed:'2026-10-31', rd:'2026-04-25'},
+  {id:5, nm:'신선마트㈜',    mc:'user_5834', ec:'ERP-00278', sd:'2026-04-01', ed:'2026-09-30', rd:'2026-03-28'},
+  {id:6, nm:'청정식품㈜',    mc:'user_2987', ec:'ERP-00189', sd:'2026-03-01', ed:'2026-08-31', rd:'2026-02-20'},
+  {id:7, nm:'나눔밥상㈜',    mc:'user_6102', ec:'ERP-00341', sd:'2026-07-01', ed:'2026-12-31', rd:'2026-06-15'},
+  {id:8, nm:'자연채소㈜',    mc:'user_7234', ec:'ERP-00299', sd:'2026-06-15', ed:'2026-12-14', rd:'2026-06-10'},
+  {id:9, nm:'풍성유통㈜',    mc:'user_3341', ec:'ERP-00177', sd:'2026-05-15', ed:'2026-11-14', rd:'2026-05-10'},
+  {id:10,nm:'식자재왕㈜',    mc:'user_8891', ec:'ERP-00423', sd:'2026-07-01', ed:'2026-12-31', rd:'2026-06-28'},
 ];
 
 let prods = {
   1:[
-    {pid:'5106703',ecd:'ERP-A001',nm:'국내산 흙대파 특 10kg/PK',tax:'과세',lp:29340,sp:20500,fp:20500,rd:'2026-06-01',md:'2026-06-01'},
-    {pid:'5106171',ecd:'ERP-A002',nm:'국내산 햇양파 1번구 특 15kg/EA',tax:'과세',lp:15780,sp:11270,fp:11270,rd:'2026-06-01',md:'2026-06-15'},
-    {pid:'5114687',ecd:'ERP-A003',nm:'[3개묶음]국내산 햇양파 특 15kg/EA',tax:'면세',lp:15780,sp:10800,fp:10800,rd:'2026-06-01',md:'2026-06-01'},
-    {pid:'5106694',ecd:'ERP-A004',nm:'국내산 양파 2번구 15kg/EA',tax:'면세',lp:15780,sp:11030,fp:11030,rd:'2026-06-01',md:'2026-06-01'},
+    {pid:'5106703',ecd:'ERP-A001',nm:'국내산 흙대파 특 10kg/PK',           tax:'과세',lp:29340,sp:20500,fp:20500,remarks:'',             rd:'2026-06-01',md:'2026-06-01'},
+    {pid:'5106171',ecd:'ERP-A002',nm:'국내산 햇양파 1번구 특 15kg/EA',     tax:'과세',lp:15780,sp:11270,fp:11270,remarks:'계약단가 협의 완료',rd:'2026-06-01',md:'2026-06-15'},
+    {pid:'5114687',ecd:'ERP-A003',nm:'[3개묶음]국내산 햇양파 특 15kg/EA',  tax:'면세',lp:15780,sp:10800,fp:10800,remarks:'',             rd:'2026-06-01',md:'2026-06-01'},
+    {pid:'5106694',ecd:'ERP-A004',nm:'국내산 양파 2번구 15kg/EA',           tax:'면세',lp:15780,sp:11030,fp:11030,remarks:'',             rd:'2026-06-01',md:'2026-06-01'},
   ],
   2:[
-    {pid:'5115566',ecd:'ERP-B001',nm:'국내산 와일드 루꼴라 1kg/PK',tax:'면세',lp:33200,sp:23200,fp:23200,rd:'2026-06-20',md:'2026-06-20'},
-    {pid:'1100381',ecd:'ERP-B002',nm:'국내산 와일드 루꼴라 500g/PK',tax:'면세',lp:18260,sp:12760,fp:12760,rd:'2026-06-20',md:'2026-06-20'},
-    {pid:'5107001',ecd:'ERP-D001',nm:'국내산 브로콜리 특 500gx5/box',tax:'면세',lp:12500,sp:8800,fp:7500,rd:'2026-06-20',md:'2026-06-20'},
-    {pid:'5107002',ecd:'ERP-D002',nm:'국내산 미니파프리카 혼합 1kg/PK',tax:'과세',lp:9800,sp:6900,fp:6000,rd:'2026-06-20',md:'2026-06-20'},
+    {pid:'5115566',ecd:'ERP-B001',nm:'국내산 와일드 루꼴라 1kg/PK',        tax:'면세',lp:33200,sp:23200,fp:23200,remarks:'',             rd:'2026-06-20',md:'2026-06-20'},
+    {pid:'1100381',ecd:'ERP-B002',nm:'국내산 와일드 루꼴라 500g/PK',       tax:'면세',lp:18260,sp:12760,fp:12760,remarks:'',             rd:'2026-06-20',md:'2026-06-20'},
+    {pid:'5113201',ecd:'ERP-G001',nm:'국내산 브로콜리 특 3kg/PK',           tax:'과세',lp:8750, sp:6120, fp:6000, remarks:'단가 재협의',  rd:'2026-06-25',md:'2026-06-25'},
+    {pid:'5113847',ecd:'ERP-G002',nm:'국내산 콜리플라워 특 3kg/PK',         tax:'과세',lp:9200, sp:6440, fp:6200, remarks:'',             rd:'2026-06-25',md:'2026-06-25'},
   ],
   3:[
-    {pid:'5106308',ecd:'ERP-C001',nm:'국내산 양상추(개별포장) 500g/EA',tax:'과세',lp:3220,sp:2250,fp:2250,rd:'2025-05-15',md:'2025-05-15'},
-    {pid:'5112284',ecd:'ERP-C002',nm:'국내산 양상추 벌크 1eax12/box',tax:'과세',lp:29580,sp:20680,fp:20680,rd:'2025-05-15',md:'2025-05-15'},
-    {pid:'5106576',ecd:'ERP-C003',nm:'국내산 부추 특 500gx2/PK',tax:'면세',lp:3540,sp:2470,fp:2470,rd:'2025-05-15',md:'2025-05-15'},
+    {pid:'5106308',ecd:'ERP-C001',nm:'국내산 양상추(개별포장) 500g/EA',    tax:'과세',lp:3220, sp:2250, fp:2250, remarks:'',             rd:'2025-05-15',md:'2025-05-15'},
+    {pid:'5112284',ecd:'ERP-C002',nm:'국내산 양상추 벌크 1eax12/box',      tax:'과세',lp:29580,sp:20680,fp:20680,remarks:'',             rd:'2025-05-15',md:'2025-05-15'},
+    {pid:'5106576',ecd:'ERP-C003',nm:'국내산 부추 특 500gx2/PK',           tax:'면세',lp:3540, sp:2470, fp:2470, remarks:'',             rd:'2025-05-15',md:'2025-05-15'},
+    {pid:'5114320',ecd:'ERP-H001',nm:'국내산 적상추 500g/PK',               tax:'면세',lp:2460, sp:1720, fp:1650, remarks:'계절가 적용',  rd:'2026-03-01',md:'2026-03-01'},
+  ],
+  4:[
+    {pid:'5109211',ecd:'ERP-D003',nm:'국내산 깐마늘 특 1kg/PK',             tax:'면세',lp:7850, sp:5480, fp:5200, remarks:'',             rd:'2026-04-25',md:'2026-04-25'},
+    {pid:'5110334',ecd:'ERP-E001',nm:'국내산 당근 특 10kg/PK',              tax:'면세',lp:11200,sp:7840, fp:7500, remarks:'',             rd:'2026-04-25',md:'2026-04-25'},
+    {pid:'5110892',ecd:'ERP-E002',nm:'국내산 무 특 20kg/EA',                tax:'면세',lp:18500,sp:12950,fp:12500,remarks:'대량구매 할인',rd:'2026-04-25',md:'2026-05-10'},
+  ],
+  5:[
+    {pid:'5111504',ecd:'ERP-F001',nm:'국내산 감자 특 10kg/PK',              tax:'면세',lp:16400,sp:11480,fp:10500,remarks:'',             rd:'2026-03-28',md:'2026-03-28'},
+    {pid:'5112018',ecd:'ERP-F002',nm:'국내산 고구마 특 5kg/PK',             tax:'면세',lp:13200,sp:9240, fp:8800, remarks:'',             rd:'2026-03-28',md:'2026-03-28'},
+    {pid:'5106563',ecd:'ERP-A005',nm:'국내산 청경채 특 4kg/box',            tax:'과세',lp:6230, sp:4350, fp:4200, remarks:'',             rd:'2026-03-28',md:'2026-03-28'},
+  ],
+  6:[
+    {pid:'5108821',ecd:'ERP-D001',nm:'국내산 시금치 특 300g/PK',            tax:'면세',lp:2980, sp:2080, fp:2000, remarks:'',             rd:'2026-02-20',md:'2026-02-20'},
+    {pid:'5109042',ecd:'ERP-D002',nm:'국내산 깻잎 특 100g/PK',              tax:'면세',lp:1290, sp:900,  fp:870,  remarks:'',             rd:'2026-02-20',md:'2026-02-20'},
+    {pid:'5115102',ecd:'ERP-H002',nm:'국내산 청경채 특 1kg/PK',             tax:'면세',lp:3180, sp:2220, fp:2100, remarks:'연간계약',      rd:'2026-02-20',md:'2026-04-01'},
+  ],
+  7:[
+    {pid:'5106171',ecd:'ERP-A002',nm:'국내산 햇양파 1번구 특 15kg/EA',     tax:'과세',lp:15780,sp:11270,fp:10800,remarks:'',             rd:'2026-06-15',md:'2026-06-15'},
+    {pid:'5106694',ecd:'ERP-A004',nm:'국내산 양파 2번구 15kg/EA',           tax:'면세',lp:15780,sp:11030,fp:10500,remarks:'',             rd:'2026-06-15',md:'2026-06-15'},
+    {pid:'5110334',ecd:'ERP-E001',nm:'국내산 당근 특 10kg/PK',              tax:'면세',lp:11200,sp:7840, fp:7400, remarks:'',             rd:'2026-06-15',md:'2026-06-15'},
+  ],
+  8:[
+    {pid:'5113201',ecd:'ERP-G001',nm:'국내산 브로콜리 특 3kg/PK',           tax:'과세',lp:8750, sp:6120, fp:5800, remarks:'',             rd:'2026-06-10',md:'2026-06-10'},
+    {pid:'5114320',ecd:'ERP-H001',nm:'국내산 적상추 500g/PK',               tax:'면세',lp:2460, sp:1720, fp:1600, remarks:'',             rd:'2026-06-10',md:'2026-06-10'},
+    {pid:'5109042',ecd:'ERP-D002',nm:'국내산 깻잎 특 100g/PK',              tax:'면세',lp:1290, sp:900,  fp:850,  remarks:'소량 특가',    rd:'2026-06-10',md:'2026-06-10'},
+  ],
+  9:[
+    {pid:'5111504',ecd:'ERP-F001',nm:'국내산 감자 특 10kg/PK',              tax:'면세',lp:16400,sp:11480,fp:11000,remarks:'',             rd:'2026-05-10',md:'2026-05-10'},
+    {pid:'5112018',ecd:'ERP-F002',nm:'국내산 고구마 특 5kg/PK',             tax:'면세',lp:13200,sp:9240, fp:9000, remarks:'',             rd:'2026-05-10',md:'2026-05-10'},
+    {pid:'5106703',ecd:'ERP-A001',nm:'국내산 흙대파 특 10kg/PK',            tax:'과세',lp:29340,sp:20500,fp:19800,remarks:'재고 우선 소진',rd:'2026-05-10',md:'2026-06-01'},
+  ],
+  10:[
+    {pid:'5106703',ecd:'ERP-A001',nm:'국내산 흙대파 특 10kg/PK',            tax:'과세',lp:29340,sp:20500,fp:19500,remarks:'대형마트 납품가',rd:'2026-06-28',md:'2026-06-28'},
+    {pid:'5108821',ecd:'ERP-D001',nm:'국내산 시금치 특 300g/PK',            tax:'면세',lp:2980, sp:2080, fp:1950, remarks:'',             rd:'2026-06-28',md:'2026-06-28'},
+    {pid:'5109211',ecd:'ERP-D003',nm:'국내산 깐마늘 특 1kg/PK',             tax:'면세',lp:7850, sp:5480, fp:5300, remarks:'분기 협의',     rd:'2026-06-28',md:'2026-06-28'},
   ],
 };
 
@@ -480,20 +570,9 @@ function renderCusts(list) {
       <td>${cnt}개</td><td>${c.rd}</td>
       <td><div class="row-actions">
         <button class="ico-btn ico-edit" onclick="event.stopPropagation();goDetail(${c.id})" title="수정"><i class="ti ti-edit"></i></button>
-        <button class="ico-btn ico-del" onclick="event.stopPropagation();deleteCust(${c.id})" title="삭제"><i class="ti ti-trash"></i></button>
       </div></td>
     </tr>`;
   }).join('');
-}
-
-function deleteCust(cid) {
-  const c = custs.find(x => x.id === cid);
-  if (!c) return;
-  if (!confirm(`"${c.nm}" 고객을 삭제하시겠습니까?\n등록된 고정가 상품도 함께 삭제됩니다.`)) return;
-  custs = custs.filter(x => x.id !== cid);
-  delete prods[cid];
-  renderCusts(custs);
-  toast('삭제되었습니다.', 'ok');
 }
 
 function doSearch() {
@@ -515,12 +594,17 @@ function showOnly(id) {
 function goDetail(cid) {
   curCid = cid; editPid = null; custMode = 'edit';
   const c = custs.find(x=>x.id===cid);
-  $('d-name').value=c.nm; $('d-mcode').value=c.mc;
-  $('d-start').value=c.sd; $('d-end').value=c.ed;
-  ['d-name','d-mcode','d-start','d-end'].forEach(id => {
-    const el = $(id); el.setAttribute('readonly',''); el.classList.add('ro');
-  });
-  $('cust-save-bar').style.display = 'none';
+  // 3-2: 기존 고객 정보는 읽기 전용
+  $('d-view-ro').style.display = '';
+  $('d-view-form').style.display = 'none';
+  $('d-ro-name').textContent   = c.nm;
+  $('d-ro-mcode').textContent  = c.mc;
+  $('d-ro-period').textContent = `${c.sd} ~ ${c.ed}`;
+  // form 숨김용 hidden inputs 도 값 세팅 (saveCust 등에서 참조)
+  $('d-name')  && ($('d-name').value  = c.nm);
+  $('d-mcode') && ($('d-mcode').value = c.mc);
+  $('d-start') && ($('d-start').value = c.sd);
+  $('d-end')   && ($('d-end').value   = c.ed);
   $('topbar-label').textContent = c.nm + ' — 고객별 고정가';
   $('detail-hd-label').textContent = '고객별고정가 상세';
   $('prod-section').style.display = 'block';
@@ -530,25 +614,25 @@ function goDetail(cid) {
 
 function goNewCust() {
   curCid = null; editPid = null; custMode = 'new';
-  ['d-name','d-mcode','d-start','d-end'].forEach(id => {
-    const el = $(id); el.value = ''; el.removeAttribute('readonly'); el.classList.remove('ro');
-  });
-  // 날짜 default: 시작일=내일, 종료일=2999-12-31
-  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-  $('d-start').value = tomorrow.toISOString().slice(0,10);
-  $('d-end').value = '2999-12-31';
-  // 등록하기 버튼 비활성화
-  const btn = $('d-save-cust-btn');
-  btn.disabled = true; btn.style.opacity = '0.4'; btn.style.cursor = 'not-allowed';
+  $('d-view-ro').style.display   = 'none';
+  $('d-view-form').style.display = '';
+  $('d-name').value=''; $('d-mcode').value='';
+  // 기본값: 적용시작일 = 오늘, 적용종료일 = 당해연도 12/31
+  const today = new Date();
+  const yyyy  = today.getFullYear();
+  const mm    = String(today.getMonth()+1).padStart(2,'0');
+  const dd    = String(today.getDate()).padStart(2,'0');
+  $('d-start').value = `${yyyy}-${mm}-${dd}`;
+  $('d-end').value   = `${yyyy}-12-31`;
   $('topbar-label').textContent = '고객 추가';
   $('detail-hd-label').textContent = '고객 추가';
-  $('cust-save-bar').style.display = 'flex';
+  $('d-save-cust-btn').textContent = '등록하기';
   $('prod-section').style.display = 'none';
   showOnly('view-detail');
 }
 
 function goList() {
-  $('topbar-label').textContent = '고객별 가격관리';
+  $('topbar-label').textContent = '고객별 고정가 관리';
   showOnly('view-list');
   renderCusts(custs);
 }
@@ -562,40 +646,6 @@ function goDetailFromEdit() {
   showOnly('view-detail');
 }
 
-function goProductEdit(pid) {
-  // pid = null → 신규, pid = '...' → 수정
-  editPid = pid;
-  const c = custs.find(x=>x.id===curCid);
-
-  const label = pid ? '상품 수정' : '상품 등록';
-  $('pe-mode-label').textContent = label;
-  $('topbar-label').textContent  = label;
-  $('pe-cnm').textContent    = c.nm;
-  $('pe-mc').textContent     = c.mc;
-  $('pe-period').textContent = c.sd + ' ~ ' + c.ed;
-
-  // 검색 영역: 신규=표시, 수정=숨김
-  $('pe-search-area').style.display = pid ? 'none' : 'block';
-  $('pe-reselect-btn').style.display = pid ? 'none' : 'inline-flex';
-
-  // 폼 초기화
-  $('p-fp').value = '';
-  clearRef();
-  $('pe-results').style.display = 'none';
-  $('pe-q-id').value=''; $('pe-q-ecd').value=''; $('pe-q-nm').value='';
-
-  if (pid) {
-    // 수정: 선택 상품 바로 표시
-    const p = (prods[curCid]||[]).find(x=>x.pid===pid);
-    $('p-id') && ($('p-id').value = pid);
-    $('p-fp').value = p.fp;
-    peShowProductInfo(pid);
-  }
-
-  showOnly('view-product-edit');
-  $('p-id').readOnly ? $('p-fp').focus() : $('p-id').focus();
-}
-
 function custAutoFill(input) {
   if (custMode !== 'new') return;
   const val = input.value.trim().toLowerCase();
@@ -607,24 +657,14 @@ function custAutoFill(input) {
   $('d-name').value  = found.nm;
   $('d-mcode').value = found.mc;
   toast('고객 정보를 불러왔습니다.', 'info');
-  checkCustReady();
-}
-
-function checkCustReady() {
-  if (custMode !== 'new') return;
-  const btn = $('d-save-cust-btn');
-  const ready = $('d-name').value.trim() !== '' && $('d-mcode').value.trim() !== '';
-  btn.disabled = !ready;
-  btn.style.opacity = ready ? '1' : '0.4';
-  btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
 }
 
 function saveCust() {
   const nm=$('d-name').value.trim(), mc=$('d-mcode').value.trim();
   const sd=$('d-start').value, ed=$('d-end').value;
   if (!nm) { toast('상호명을 입력하세요.', 'err'); return; }
-  if (!sd) { toast('적용 시작일을 입력하세요.', 'err'); return; }
-  if (!ed) { toast('적용 종료일을 입력하세요.', 'err'); return; }
+  if (!sd) { toast('적용기간 시작일을 입력하세요.', 'err'); return; }
+  if (!ed) { toast('적용기간 종료일을 입력하세요.', 'err'); return; }
   if (ed < sd) { toast('종료일은 시작일 이후여야 합니다.', 'err'); return; }
 
   if (custMode === 'new') {
@@ -647,6 +687,7 @@ function saveCust() {
 
 // --- 상품 검색 모달 ---
 function openProductSearchModal() {
+  $('m-q-type').value=''; $('m-q-scale').value='';
   $('m-q-id').value=''; $('m-q-ecd').value=''; $('m-q-nm').value='';
   $('m-results').style.display = 'none';
   $('modal-product-search').style.display = 'flex';
@@ -658,20 +699,24 @@ function closeProductModal() {
 }
 
 function mClear() {
+  $('m-q-type').value=''; $('m-q-scale').value='';
   $('m-q-id').value=''; $('m-q-ecd').value=''; $('m-q-nm').value='';
   $('m-results').style.display = 'none';
 }
 
 function mSearch() {
-  const qid  = $('m-q-id').value.trim().toLowerCase();
-  const qecd = $('m-q-ecd').value.trim().toLowerCase();
-  const qnm  = $('m-q-nm').value.trim().toLowerCase();
-  if (!qid && !qecd && !qnm) { toast('검색어를 하나 이상 입력하세요.', 'err'); return; }
+  const qtype  = $('m-q-type').value;
+  const qscale = $('m-q-scale').value;
+  const qid    = $('m-q-id').value.trim().toLowerCase();
+  const qecd   = $('m-q-ecd').value.trim().toLowerCase();
+  const qnm    = $('m-q-nm').value.trim().toLowerCase();
 
   const results = Object.entries(catalog).filter(([pid, c]) => {
-    if (qid  && !pid.toLowerCase().includes(qid))    return false;
-    if (qecd && !c.ecd.toLowerCase().includes(qecd)) return false;
-    if (qnm  && !c.nm.toLowerCase().includes(qnm))   return false;
+    if (qtype  && c.type  !== qtype)                        return false;
+    if (qscale && c.scale !== qscale)                       return false;
+    if (qid    && !pid.toLowerCase().includes(qid))         return false;
+    if (qecd   && !c.ecd.toLowerCase().includes(qecd))      return false;
+    if (qnm    && !c.nm.toLowerCase().includes(qnm))        return false;
     return true;
   });
 
@@ -679,15 +724,20 @@ function mSearch() {
   $('m-results').style.display = 'block';
   const tb = $('m-tbody');
   if (!results.length) {
-    tb.innerHTML = '<tr><td colspan="5" class="empty">검색 결과가 없습니다</td></tr>'; return;
+    tb.innerHTML = '<tr><td colspan="8" class="empty">검색 결과가 없습니다</td></tr>'; return;
   }
   tb.innerHTML = results.map(([pid, c]) => `
     <tr onclick="mSelectProduct('${pid}')" style="cursor:pointer;">
       <td class="lnk">${pid}</td>
       <td>${c.ecd}</td>
-      <td>${c.nm}</td>
-      <td><span class="bx ${c.tax==='과세'?'tax':'free'}">${c.tax}</span></td>
-      <td>${f(c.lp)}</td>
+      <td>${c.type}</td>
+      <td>${c.delivery}</td>
+      <td>${c.scale}</td>
+      <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;">${c.nm}</td>
+      <td>${c.status === '판매가능'
+        ? `<span class="tag-on">${c.status}</span>`
+        : `<span class="tag-stop">${c.status}</span>`}</td>
+      <td style="text-align:right;">${f(c.lp)}</td>
     </tr>`).join('');
 }
 
@@ -696,7 +746,22 @@ let pfSelectedPid = null, pfMode = 'new';
 
 function mSelectProduct(pid) {
   closeProductModal();
-  pfSetProduct(pid);
+  const existing = (prods[curCid]||[]).find(p=>p.pid===pid);
+  if (existing) {
+    // S3-C: 이미 등록된 상품 → 기존 입력값으로 edit 모드 전환
+    pfMode = 'edit'; pfSelectedPid = pid;
+    pfSetProduct(pid);
+    pfTogglePriceRef(false);
+    $('pf-fp').value = existing.fp;
+    $('pf-remarks').value = existing.remarks || '';
+    $('pf-mode-badge').textContent = '수정 중';
+    $('pf-mode-badge').style.background = '#FEF3C7';
+    $('pf-mode-badge').style.color = '#92400E';
+    document.querySelectorAll('#prod-tbody tr').forEach(r=>r.classList.toggle('sel', r.dataset.pid===pid));
+    toast('이미 등록된 상품입니다. 수정 모드로 전환됩니다.', 'info');
+  } else {
+    pfSetProduct(pid);
+  }
 }
 
 function pfQuickLookup() {
@@ -704,11 +769,10 @@ function pfQuickLookup() {
   if (!q) return;
   if (catalog[q])           { pfSetProduct(q);             return; }
   if (catalogByEcd[q])      { pfSetProduct(catalogByEcd[q].pid); return; }
-  // partial match
   const hit = Object.entries(catalog).find(([pid,c]) =>
     pid.includes(q) || c.ecd.toLowerCase().includes(q.toLowerCase()) || c.nm.toLowerCase().includes(q.toLowerCase())
   );
-  if (hit) { pfSetProduct(hit[0]); return; }
+  if (hit) { mSelectProduct(hit[0]); return; }
   toast('상품을 찾을 수 없습니다.', 'err');
 }
 
@@ -717,31 +781,34 @@ function pfSetProduct(pid) {
   if (!cat) return;
   pfSelectedPid = pid;
   $('pf-q').value         = pid;
-  $('pf-ecd').value       = cat.ecd;
   $('pf-nm').value        = cat.nm;
   $('pf-tax').value       = cat.tax;
   $('pf-lp').value        = f(cat.lp) + '원';
-  $('pf-sp-sub').textContent      = f(cat.sp) + '원';
+  $('pf-sp').value        = f(cat.sp) + '원';
   const hasAi = cat.ai > 0;
-  const isExisting = pfMode === 'edit';
-  // 기존 등록 상품: 최대할인가·AI쿠폰 값 미노출 (항목은 유지)
-  $('pf-md-price').value          = isExisting ? '' : f(cat.md) + '원';
-  $('pf-aibase-sub').textContent  = isExisting ? '-' : (hasAi ? '-' : f(cat.aiBase) + '원');
-  $('pf-ai-sub').textContent      = isExisting ? '-' : (hasAi ? f(cat.ai) + '원' : '-');
+  $('pf-ai-base').value   = hasAi ? '-' : f(cat.aiBase) + '원';
+  $('pf-ai').value        = hasAi ? f(cat.ai) + '원' : '-';
+  $('pf-md-price').value  = f(cat.md) + '원';
   if (pfMode === 'new') $('pf-fp').value = '';
   setTimeout(()=>$('pf-fp').focus(), 30);
 }
 
+function pfTogglePriceRef(show) {
+  ['pf-ai-base','pf-ai','pf-md-price'].forEach(id => {
+    const cell = $(id) && $(id).closest('.fg-cell');
+    if (cell) cell.style.display = show ? '' : 'none';
+  });
+}
+
 function pfClear() {
   pfSelectedPid = null; pfMode = 'new';
-  ['pf-q','pf-ecd','pf-nm','pf-tax','pf-lp','pf-md-price','pf-fp'].forEach(id=>$(id).value='');
-  $('pf-sp-sub').textContent     = '-';
-  $('pf-aibase-sub').textContent = '-';
-  $('pf-ai-sub').textContent     = '-';
+  ['pf-q','pf-nm','pf-tax','pf-lp','pf-sp','pf-ai-base','pf-ai','pf-md-price','pf-fp'].forEach(id=>$(id).value='');
+  $('pf-remarks').value = '';
   $('pf-mode-badge').textContent = '신규';
   $('pf-mode-badge').style.background = '#EEF0FF';
   $('pf-mode-badge').style.color = '#7B5CFA';
   document.querySelectorAll('#prod-tbody tr.sel').forEach(r=>r.classList.remove('sel'));
+  pfTogglePriceRef(true);
 }
 
 function pfEditProd(pid) {
@@ -750,7 +817,9 @@ function pfEditProd(pid) {
   if (!prod) return;
   pfMode = 'edit'; pfSelectedPid = pid;
   pfSetProduct(pid);
+  pfTogglePriceRef(false);
   $('pf-fp').value = prod.fp;
+  $('pf-remarks').value = prod.remarks || '';
   $('pf-mode-badge').textContent = '수정 중';
   $('pf-mode-badge').style.background = '#FEF3C7';
   $('pf-mode-badge').style.color = '#92400E';
@@ -761,16 +830,36 @@ function pfEditProd(pid) {
 function pfSave() {
   if (!pfSelectedPid) { toast('상품을 선택하세요.', 'err'); return; }
   const fp = Number($('pf-fp').value);
-  if (!fp || fp <= 0) { toast('고객별고정가는 0보다 커야 합니다.', 'err'); return; }
+  if (!fp || fp <= 0) { toast('금액은 0보다 큰 숫자를 입력해주세요.', 'err'); return; }
+  const cat = catalog[pfSelectedPid];
+  if (fp > cat.lp) { toast(`고객별고정가는 정가(${f(cat.lp)}원) 이하로 입력해주세요.`, 'err'); return; }
+  if (fp > cat.sp) { toast(`고객별고정가는 판매가(${f(cat.sp)}원) 이하로 입력해주세요.`, 'err'); return; }
+  // S3-E-1: 저장 confirm
+  const cust = custs.find(x=>x.id===curCid);
+  const sd = cust ? cust.sd : '';
+  const now = new Date();
+  const isLateEvening = now.getHours() >= 18 && pfMode !== 'edit';
+  let confirmMsg;
+  if (isLateEvening) {
+    // S3-E-2: 오후6시 이후 신규등록 예외
+    const d2 = new Date(now); d2.setDate(d2.getDate()+2);
+    const d2str = `${d2.getMonth()+1}월${d2.getDate()}일`;
+    confirmMsg = `오후6시부터 AI개인화쿠폰이 발급되어 모레(${d2str})부터 고정가가 적용될 수 있습니다. 지금 등록하시겠습니까?`;
+  } else {
+    const d = sd ? new Date(sd) : null;
+    const sdStr = d ? `${d.getMonth()+1}월${d.getDate()}일` : (sd||'-');
+    confirmMsg = `저장하시겠습니까? 적용시작일(${sdStr})부터 입력하신 고정가가 적용됩니다.`;
+  }
+  if (!confirm(confirmMsg)) return;
+  const remarks = $('pf-remarks').value.trim();
   const list = prods[curCid] || (prods[curCid]=[]);
   if (pfMode === 'edit') {
     const idx = list.findIndex(p=>p.pid===pfSelectedPid);
-    if (idx!==-1) { list[idx].fp=fp; list[idx].md=td(); }
+    if (idx!==-1) { list[idx].fp=fp; list[idx].remarks=remarks; list[idx].md=td(); }
     toast('고객별고정가가 수정되었습니다.');
   } else {
     if (list.some(p=>p.pid===pfSelectedPid)) { toast('이미 등록된 상품입니다.', 'err'); return; }
-    const cat = catalog[pfSelectedPid];
-    list.push({pid:pfSelectedPid,ecd:cat.ecd,nm:cat.nm,tax:cat.tax,lp:cat.lp,sp:cat.sp,fp,rd:td(),md:td()});
+    list.push({pid:pfSelectedPid,ecd:cat.ecd,nm:cat.nm,tax:cat.tax,lp:cat.lp,sp:cat.sp,fp,remarks,rd:td(),md:td()});
     toast('상품이 등록되었습니다.');
   }
   pfClear();
@@ -815,17 +904,8 @@ function peClearSearch() {
   $('ref-bar').style.display = 'none';
 }
 
-function peReselect() {
-  $('ref-bar').style.display = 'none';
-  $('pe-search-area').style.display = 'block';
-  // 검색 결과가 있으면 그대로 유지
-  if ($('pe-results').style.display !== 'none') return;
-  $('pe-q-id').focus();
-}
-
 function peSelectProduct(pid) {
   peShowProductInfo(pid);
-  // 선택 행 강조
   document.querySelectorAll('#pe-res-tbody tr').forEach(r =>
     r.classList.toggle('sel', r.querySelector('.lnk')?.textContent === pid));
 }
@@ -833,7 +913,7 @@ function peSelectProduct(pid) {
 function peShowProductInfo(pid) {
   const cat = catalog[pid];
   if (!cat) return;
-  $('p-id') && ($('p-id').value = pid);   // saveProd에서 사용
+  $('p-id') && ($('p-id').value = pid);
   $('r-pid').textContent     = pid;
   $('p-ecd').textContent     = cat.ecd;
   $('p-nm').textContent      = cat.nm;
@@ -841,16 +921,12 @@ function peShowProductInfo(pid) {
   $('r-lp').textContent  = f(cat.lp)+'원';
   $('r-sp').textContent  = f(cat.sp)+'원';
   const hasAi = cat.ai > 0;
-  const isEditMode = !!editPid;
-  // 기존 등록 상품 수정 시: AI쿠폰금액·최대할인가 값 미노출 (항목은 유지)
-  $('r-ai-base').textContent = isEditMode ? '-' : (hasAi ? '-' : f(cat.aiBase)+'원');
-  $('r-ai-val').textContent  = isEditMode ? '-' : (hasAi ? f(cat.ai)+'원' : '-');
-  $('r-md').textContent      = isEditMode ? '-' : f(cat.md)+'원';
+  $('r-ai-base').textContent = hasAi ? '-' : f(cat.aiBase)+'원';
+  $('r-ai-val').textContent  = hasAi ? f(cat.ai)+'원' : '-';
+  $('r-md').textContent  = f(cat.md)+'원';
   $('ref-bar').style.display = 'block';
   $('p-fp').focus();
 }
-
-function lookupProd() { peSearch(); }  // 하위 호환
 
 function clearRef() {
   $('ref-bar').style.display = 'none';
@@ -858,7 +934,6 @@ function clearRef() {
 
 function resetForm() {
   editPid=null;
-  $('p-id').value=''; $('p-id').readOnly=false;
   clearRef(); $('p-fp').value='';
 }
 
@@ -876,7 +951,7 @@ function saveProd() {
     toast('고객별고정가가 수정되었습니다.');
   } else {
     if (list.some(p=>p.pid===pid)) { toast('이미 해당 고객에 동일 상품이 등록되어 있습니다.', 'err'); return; }
-    list.push({pid,ecd:cat.ecd,nm:cat.nm,tax:cat.tax,lp:cat.lp,sp:cat.sp,fp:Number(fpv),rd:td(),md:td()});
+    list.push({pid,ecd:cat.ecd,nm:cat.nm,tax:cat.tax,lp:cat.lp,sp:cat.sp,fp:Number(fpv),remarks:'',rd:td(),md:td()});
     toast('상품이 등록되었습니다.');
   }
   goDetailFromEdit();
@@ -919,38 +994,51 @@ function detailSaveAll() {
     const idx  = list.findIndex(p => p.pid === pid);
     if (idx !== -1) { list[idx].fp = Number(inp.value); list[idx].md = td(); }
   });
+  document.querySelectorAll('.d-rem-input').forEach(inp => {
+    const pid = inp.dataset.pid;
+    const list = prods[curCid]||[];
+    const idx  = list.findIndex(p => p.pid === pid);
+    if (idx !== -1) { list[idx].remarks = inp.value.trim(); }
+  });
   detailCancelEdit();
   toast(`${inputs.length}건 고객별고정가가 일괄 수정되었습니다.`);
 }
 
 function delProd(pid) {
-  if (!confirm('삭제하시겠습니까?\n이력은 보존됩니다.')) return;
+  const prod = (prods[curCid]||[]).find(p=>p.pid===pid);
+  const nm = prod ? prod.nm : pid;
+  if (!confirm(`${nm}\n상품을 삭제하시겠습니까? 삭제가 완료되는 즉시 기존 가격이 노출됩니다.`)) return;
   prods[curCid] = (prods[curCid]||[]).filter(p=>p.pid!==pid);
   renderProds(detailEditMode); toast('삭제되었습니다.');
 }
 
 function renderProds(editMode=false) {
-  const list = prods[curCid]||[];
+  const list = [...(prods[curCid]||[])].sort((a,b) =>
+    a.pid.localeCompare(b.pid) || a.ecd.localeCompare(b.ecd)
+  );
+  const cust = custs.find(x=>x.id===curCid);
   $('prod-cnt').textContent = list.length;
   const tb = $('prod-tbody');
   if (!list.length) { tb.innerHTML='<tr><td colspan="10" class="empty">등록된 상품이 없습니다. 위 폼에서 상품을 검색하여 추가하세요.</td></tr>'; return; }
   tb.innerHTML = list.map(p=>`<tr data-pid="${p.pid}" ${editMode ? '' : `onclick="pfEditProd('${p.pid}')" style="cursor:pointer;"`}>
-    <td>${p.pid}</td>
     <td>${p.ecd}</td>
+    <td>${p.pid}</td>
     <td style="max-width:190px;overflow:hidden;text-overflow:ellipsis;">${p.nm}</td>
     <td><span class="bx ${p.tax==='과세'?'tax':'free'}">${p.tax}</span></td>
     <td>${f(p.lp)}</td>
-    <td>${f(p.sp ?? catalog[p.pid]?.sp)}</td>
+    <td>${typeof p.sp === 'number' ? f(p.sp) : '-'}</td>
     <td>${editMode
       ? `<input type="number" class="d-fp-input" data-pid="${p.pid}" value="${p.fp}" style="width:108px;height:26px;font-size:12px;">`
       : `<span class="hp">${f(p.fp)}</span>`}</td>
-    <td>${p.rd}</td>
+    <td>${editMode
+      ? `<input type="text" class="d-rem-input" data-pid="${p.pid}" value="${p.remarks||''}" style="width:130px;height:26px;font-size:12px;">`
+      : `<span style="color:#6B7280;">${p.remarks||'-'}</span>`}</td>
+    <td>${cust ? cust.sd : '-'}</td>
     <td>${editMode ? `<span style="color:#9CA3AF;font-size:11px;">대기</span>` : p.md}</td>
     <td><div class="row-actions"><button class="ico-btn ico-del" onclick="event.stopPropagation();delProd('${p.pid}')" title="삭제"><i class="ti ti-trash"></i></button></div></td>
   </tr>`).join('');
 }
 
-// --- 탭 전환 ---
 let activeTab = 'fixed';
 function switchTab(tab) {
   activeTab = tab;
@@ -961,7 +1049,7 @@ function switchTab(tab) {
   $('view-detail').style.display = 'none';
   $('view-product-edit').style.display = 'none';
   $('view-product-price').style.display = isFixed ? 'none' : 'block';
-  $('topbar-label').textContent = isFixed ? '고객별 가격관리' : '상품별 가격관리';
+  $('topbar-label').textContent = isFixed ? '고객별 고정가 관리' : '상품별 가격관리';
   if (isFixed) {
     renderCusts(custs);
   } else {
@@ -971,24 +1059,20 @@ function switchTab(tab) {
   }
 }
 
-// --- 상품별 가격관리 (flat: 상품×고객 행) ---
 let ppEditMode = false;
-let ppCurrentRows = []; // 현재 표시 중인 행
+let ppCurrentRows = [];
 
 function ppBuildRows() {
-  // 전체 상품×고객 조합 flat list
   const rows = [];
   custs.forEach(c => {
     (prods[c.id]||[]).forEach(p => {
       rows.push({
-        pid: p.pid, ecd: p.ecd, nm: p.nm, tax: p.tax, lp: p.lp,
-        sp: p.sp ?? catalog[p.pid]?.sp,
+        pid: p.pid, ecd: p.ecd, nm: p.nm, tax: p.tax, lp: p.lp, sp: p.sp||'-',
         cid: c.id, cnm: c.nm, mc: c.mc, sd: c.sd, ed: c.ed,
-        fp: p.fp, rd: p.rd, md: p.md
+        fp: p.fp, remarks: p.remarks||'', rd: p.rd, md: p.md
       });
     });
   });
-  // 최신 수정일 순, 수정일 없으면 최신 등록일 순
   rows.sort((a, b) => {
     const da = a.md || a.rd;
     const db = b.md || b.rd;
@@ -1028,19 +1112,22 @@ function ppRenderTable(editMode) {
     return;
   }
   tb.innerHTML = rows.map((r, i) => `<tr data-idx="${i}">
-    <td>${r.pid}</td>
     <td>${r.ecd}</td>
+    <td>${r.pid}</td>
     <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${r.nm}</td>
     <td><span class="bx ${r.tax==='과세'?'tax':'free'}">${r.tax}</span></td>
     <td>${f(r.lp)}</td>
-    <td>${f(r.sp)}</td>
+    <td>${typeof r.sp === 'number' ? f(r.sp) : '-'}</td>
     <td>${editMode
       ? `<input type="number" class="pp-fp-input" data-idx="${i}" value="${r.fp}" style="width:108px;height:26px;font-size:12px;">`
       : `<span class="hp">${f(r.fp)}</span>`}</td>
+    <td>${editMode
+      ? `<input type="text" class="pp-rem-input" data-idx="${i}" value="${r.remarks||''}" style="width:110px;height:26px;font-size:12px;">`
+      : `<span style="color:#6B7280;">${r.remarks||'-'}</span>`}</td>
     <td>${r.cnm}</td>
     <td>${r.mc}</td>
     <td>${r.sd}</td>
-    <td>${r.md||'-'}</td>
+    <td>${r.md}</td>
   </tr>`).join('');
 }
 
@@ -1083,13 +1170,19 @@ function ppSaveAll() {
     const pidx = list.findIndex(p => p.pid === r.pid);
     if (pidx !== -1) { list[pidx].fp = fp; list[pidx].md = td(); r.fp = fp; r.md = td(); }
   });
+  document.querySelectorAll('.pp-rem-input').forEach(inp => {
+    const idx = Number(inp.dataset.idx);
+    const r = ppCurrentRows[idx];
+    const list = prods[r.cid]||[];
+    const pidx = list.findIndex(p => p.pid === r.pid);
+    if (pidx !== -1) { list[pidx].remarks = inp.value.trim(); r.remarks = inp.value.trim(); }
+  });
 
   ppExitEditMode();
   ppRenderTable(false);
   toast(`${inputs.length}건 고객별고정가가 일괄 수정되었습니다.`);
 }
 
-// 엔터키 지원
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeProductModal();
   if (e.key !== 'Enter') return;
@@ -1098,6 +1191,7 @@ document.addEventListener('keydown', e => {
   if (['pp-search-id','pp-search-ecd','pp-search-nm'].includes(document.activeElement.id)) ppSearch();
 });
 
+// 초기 렌더
 renderCusts(custs);
 </script>
 </body>
